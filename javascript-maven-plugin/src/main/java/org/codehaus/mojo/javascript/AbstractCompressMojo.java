@@ -1,6 +1,10 @@
 package org.codehaus.mojo.javascript;
 
 /*
+ * Derivative Work
+ * Copyright 2010 SOFTEC sa. All rights reserved.
+ *
+ * Original Work
  * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -267,7 +271,7 @@ public abstract class AbstractCompressMojo
         // TODO don't have version hardcoded
         Artifact compressorArtifact =
             artifactFactory.createDependencyArtifact( "org.codehaus.mojo.javascript", id,
-                VersionRange.createFromVersion( "1.0-alpha-1-SNAPSHOT" ), "jar", null,
+                VersionRange.createFromVersion( "1.0-softec" ), "jar", null,
                 Artifact.SCOPE_RUNTIME );
 
         Artifact originatingArtifact =

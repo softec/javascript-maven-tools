@@ -1,6 +1,10 @@
 package org.codehaus.mojo.javascript;
 
 /*
+ * Derivative Work
+ * Copyright 2010 SOFTEC sa. All rights reserved.
+ *
+ * Original Work
  * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +25,6 @@ import java.io.File;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.codehaus.mojo.javascript.archive.JavascriptArtifactManager;
 import org.codehaus.plexus.archiver.ArchiverException;
 
 /**
@@ -66,11 +69,6 @@ public class WarPackageMojo
     private boolean useArtifactId;
 
     /**
-     * @component 
-     */
-    private JavascriptArtifactManager javascriptArtifactManager;
-
-    /**
      * {@inheritDoc}
      * 
      * @see org.apache.maven.plugin.Mojo#execute()
@@ -83,8 +81,8 @@ public class WarPackageMojo
 
         try
         {
-            javascriptArtifactManager.unpack( getProject(), DefaultArtifact.SCOPE_RUNTIME,
-                new File( webappDirectory, scriptsDirectory + "/" + libsDirectory ), useArtifactId );
+            getJavascriptArtifactManager().unpack( getProject(), DefaultArtifact.SCOPE_RUNTIME,
+                new File( webappDirectory, scriptsDirectory + File.separator + libsDirectory ), useArtifactId );
         }
         catch ( ArchiverException e )
         {

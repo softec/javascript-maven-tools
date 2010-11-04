@@ -1,6 +1,10 @@
 package org.codehaus.mojo.javascript.archive;
 
 /*
+ * Derivative Work
+ * Copyright 2010 SOFTEC sa. All rights reserved.
+ *
+ * Original Work
  * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,9 +54,10 @@ public class JavascriptArtifactManager
         super();
     }
 
-    public void unpack( MavenProject project, String scope, File target, boolean useArtifactId )
+    public int unpack( MavenProject project, String scope, File target, boolean useArtifactId )
         throws ArchiverException
     {
+        int count = 0;
         archiver.setOverwrite( false );
 
         Set dependencies = project.getArtifacts();
@@ -72,8 +77,11 @@ public class JavascriptArtifactManager
                     dest = new File( target, dependency.getArtifactId() );
                 }
                 unpack( dependency, dest );
+                count++;
             }
         }
+
+        return count;
     }
 
     /**

@@ -1,6 +1,10 @@
 package org.codehaus.mojo.javascript;
 
 /*
+ * Derivative Work
+ * Copyright 2010 SOFTEC sa. All rights reserved.
+ *
+ * Original Work
  * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -94,7 +98,7 @@ public class InPlaceMojo
         try
         {
             javascriptArtifactManager.unpack( project, DefaultArtifact.SCOPE_RUNTIME, new File(
-                warSourceDirectory, scriptsDirectory + "/" + libsDirectory ), useArtifactId );
+                warSourceDirectory, scriptsDirectory + File.separator + libsDirectory ), useArtifactId );
         }
         catch ( ArchiverException e )
         {

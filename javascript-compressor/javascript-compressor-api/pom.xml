@@ -2,6 +2,10 @@
 
 <!--
   /*
+  * Derivative Work
+  * Copyright 2010 SOFTEC sa. All rights reserved.
+  *
+  * Original Work
   * Copyright 2001-2005 The Apache Software Foundation.
   *
   * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +30,7 @@
   <parent>
     <groupId>org.codehaus.mojo.javascript</groupId>
     <artifactId>javascript-compressor</artifactId>
-    <version>1.0-alpha-1-SNAPSHOT</version>
+    <version>1.0-softec</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>

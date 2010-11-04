@@ -5,6 +5,9 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>javascript-maven-plugin</artifactId>
         <configuration>
+          <project implementation="org.codehaus.mojo.javascript.stub.MavenProjectStub">
+            <artifactId>test</artifactId>
+          </project>
           <sourceDirectory>src/test/resources/scripts</sourceDirectory>
           <outputDirectory>target/test-target/compile</outputDirectory>
           <descriptor>src/test/resources/assembler.xml</descriptor>

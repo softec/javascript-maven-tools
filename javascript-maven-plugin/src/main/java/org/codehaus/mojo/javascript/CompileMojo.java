@@ -1,6 +1,10 @@
 package org.codehaus.mojo.javascript;
 
 /*
+ * Derivative Work
+ * Copyright 2010 SOFTEC sa. All rights reserved.
+ *
+ * Original Work
  * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,14 +30,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.mojo.javascript.archive.JavascriptArtifactManager;
 import org.codehaus.mojo.javascript.assembler.Assembler;
 import org.codehaus.mojo.javascript.assembler.AssemblerReader;
 import org.codehaus.mojo.javascript.assembler.AssemblerReaderManager;
 import org.codehaus.mojo.javascript.assembler.Script;
+import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -42,9 +49,10 @@ import org.codehaus.plexus.util.IOUtil;
  * Goal which assemble javascript sources into the packaging directory. An
  * optional assembler descriptor can be set to configure scripts to be merged.
  * Other scripts are simply copied to the output directory.
- * 
+ *
  * @goal compile
  * @phase compile
+ * @requiresDependencyResolution compile
  * @author <a href="mailto:nicolas@apache.org">Nicolas De Loof</a>
  */
 public class CompileMojo
@@ -55,7 +63,7 @@ public class CompileMojo
 
     /**
      * The maven project.
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -64,28 +72,42 @@ public class CompileMojo
 
     /**
      * Location of the source files.
-     * 
+     *
      * @parameter default-value="${basedir}/src/main/javascript"
      */
     protected File sourceDirectory;
 
     /**
      * The output directory of the assembled js file.
-     * 
+     *
      * @parameter default-value="${project.build.outputDirectory}"
      */
     protected File outputDirectory;
 
     /**
+     * The folder where javascript dependencies are extracted and taken during assembling
+     *
+     * @parameter default-value="${project.build.directory}/javascript-dependency"
+     */
+    protected File depsDirectory;
+
+    /**
+     * For dependencies, if true, create a folder named by the artifactId while unpacking
+     *
+     * @parameter
+     */
+    private boolean useArtifactId;
+
+    /**
      * Exclusion pattern.
-     * 
+     *
      * @parameter
      */
     private String[] excludes;
 
     /**
      * Inclusion pattern.
-     * 
+     *
      * @parameter
      */
     private String[] includes;
@@ -98,22 +120,40 @@ public class CompileMojo
     /**
      * Descriptor for the strategy to assemble individual scripts sources into
      * destination.
-     * 
-     * @parameter default-value="src/assembler/${project.artifactId}.xml"
+     *
+     * @parameter default-value="${basedir}/src/assembler/${project.artifactId}.xml"
      */
     private File descriptor;
 
     /**
      * Descriptor file format (default or jsbuilder)
-     * 
+     *
      * @parameter
      */
     private String descriptorFormat;
+
+    /**
+     * @component
+     */
+    private JavascriptArtifactManager javascriptArtifactManager;
+
+    // Compile-time dependency count
+    private int depsCount = 0;
 
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
         outputDirectory.mkdirs();
+
+        try
+        {
+            depsCount = getJavascriptArtifactManager().unpack( getProject(), DefaultArtifact.SCOPE_COMPILE,
+                depsDirectory, useArtifactId );
+        }
+        catch ( ArchiverException e )
+        {
+            throw new MojoExecutionException( "Failed to unpack javascript dependencies", e );
+        }
 
         Set merged = assemble();
 
@@ -121,40 +161,43 @@ public class CompileMojo
         {
             includes = DEFAULT_INCLUDES;
         }
-        DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir( sourceDirectory );
-        scanner.setExcludes( excludes );
-        scanner.addDefaultExcludes();
 
-        scanner.setIncludes( includes );
-        scanner.scan();
+        if( sourceDirectory.isDirectory() ) {
+            DirectoryScanner scanner = new DirectoryScanner();
+            scanner.setBasedir( sourceDirectory );
+            scanner.setExcludes( excludes );
+            scanner.addDefaultExcludes();
 
-        try
-        {
-            String[] files = scanner.getIncludedFiles();
-            for ( int i = 0; i < files.length; i++ )
+            scanner.setIncludes( includes );
+            scanner.scan();
+
+            try
             {
-                String file = files[i];
-                if ( merged.contains( file ) )
+                String[] files = scanner.getIncludedFiles();
+                for ( int i = 0; i < files.length; i++ )
                 {
-                    continue;
+                    String file = files[i];
+                    if ( merged.contains( file ) )
+                    {
+                        continue;
+                    }
+                    File source = new File( sourceDirectory, file );
+                    File dest = new File( outputDirectory, file );
+                    dest.getParentFile().mkdir();
+                    FileUtils.copyFile( source, dest );
                 }
-                File source = new File( sourceDirectory, file );
-                File dest = new File( outputDirectory, file );
-                dest.getParentFile().mkdir();
-                FileUtils.copyFile( source, dest );
             }
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Failed to copy source files to " + outputDirectory,
-                e );
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( "Failed to copy source files to " + outputDirectory,
+                    e );
+            }
         }
     }
 
     /**
      * Honor the assembly rules to build merged scripts from individual ones.
-     * 
+     *
      * @return a set of all script merged, to be skiped from the target
      * directory.
      * @throws MojoExecutionException
@@ -206,10 +249,27 @@ public class CompileMojo
     {
         Set merged = new HashSet();
 
-        DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir( sourceDirectory );
-        scanner.setExcludes( excludes );
-        scanner.addDefaultExcludes();
+        DirectoryScanner scanner = null;
+        if( sourceDirectory.isDirectory() ) {
+            scanner = new DirectoryScanner();
+            scanner.setBasedir( sourceDirectory );
+            scanner.setExcludes( excludes );
+            scanner.addDefaultExcludes();
+        }
+
+        DirectoryScanner depsScan = null;
+        if( depsCount > 0 ) {
+            depsScan = new DirectoryScanner();
+            depsScan.setBasedir( depsDirectory );
+            depsScan.setExcludes( excludes );
+            depsScan.addDefaultExcludes();
+        } else {
+            getLog().info( "No compile time dependency - just assembling local scripts" );
+        }
+
+        if( scanner == null && depsScan == null ) {
+            throw new MojoExecutionException( "Nothing to compile or assemble ?" );
+        }
 
         for ( Iterator iterator = assembler.getScripts().iterator(); iterator.hasNext(); )
         {
@@ -226,17 +286,12 @@ public class CompileMojo
                 for ( Iterator iter = scriptOrderedIncludes.iterator(); iter.hasNext(); )
                 {
                     String scriptInclude = (String) iter.next();
-                    scanner.setIncludes( new String[] { scriptInclude } );
-                    scanner.scan();
 
-                    String[] files = scanner.getIncludedFiles();
-                    for ( int i = 0; i < files.length; i++ )
+                    if ((scanner == null ||
+                        appendScriptFile(sourceDirectory, scanner, writer, scriptInclude, merged) < 1)
+                        && depsScan != null)
                     {
-                        String file = files[i];
-                        File source = new File( sourceDirectory.getAbsolutePath() + "/" + file );
-                        IOUtil.copy( new FileReader( source ), writer );
-                        writer.println();
-                        merged.add( file );
+                        appendScriptFile(depsDirectory, depsScan, writer, scriptInclude, null);
                     }
                 }
             }
@@ -252,11 +307,40 @@ public class CompileMojo
         return merged;
     }
 
+    private int appendScriptFile(File dir, DirectoryScanner scanner, PrintWriter writer, String scriptInclude, Set merged)
+        throws IOException
+    {
+        scanner.setIncludes( new String[] { scriptInclude } );
+        scanner.scan();
+
+        String[] files = scanner.getIncludedFiles();
+        for ( int i = 0; i < files.length; i++ )
+        {
+            String file = files[i];
+            File source = new File( dir, file );
+            IOUtil.copy( new FileReader( source ), writer );
+            writer.println();
+            if( merged != null ) {
+                merged.add( file );
+            }
+        }
+
+        return files.length;
+    }
+
     /**
      * @return the project
      */
     protected MavenProject getProject()
     {
         return project;
+    }
+
+    /**
+     * @return the javascript artifact manager
+     */
+    protected JavascriptArtifactManager getJavascriptArtifactManager()
+    {
+        return javascriptArtifactManager;
     }
 }

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
+  ~ Derivative Work
+  ~ Copyright 2010 SOFTEC sa. All rights reserved.
+  ~
+  ~ Original Work
   ~ Copyright 2006-2007 Nicolas De Loof.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,9 +22,9 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <groupId>org.codehaus.mojo</groupId>
-    <artifactId>mojo-sandbox</artifactId>
-    <version>5-SNAPSHOT</version>
+    <groupId>lu.softec</groupId>
+    <artifactId>softec</artifactId>
+    <version>2</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -28,7 +32,7 @@
   <artifactId>javascript-maven-tools</artifactId>
   <packaging>pom</packaging>
   <name>Maven tools for JavaScript developers</name>
-  <version>1.0-alpha-1-SNAPSHOT</version>
+  <version>1.0-softec</version>
   <url>http://mojo.codehaus.org/javascript-maven-tools</url>
 
   <description>
@@ -66,9 +70,9 @@
   </contributors>
     
   <scm>
-    <connection>scm:svn:https://svn.codehaus.org/mojo/trunk/sandbox/javascript-maven-tools</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/sandbox/javascript-maven-tools</developerConnection>
-    <url>http://fisheye.codehaus.org/browse/mojo/trunk/sandbox/javascript-maven-tools</url>
+    <connection>scm:svn:http://svn.softec.lu/java/trunk/javascript-maven-tools</connection>
+    <developerConnection>scm:svn:svn+ssh://svn@svn.softec.lu/java/trunk/javascript-maven-tools</developerConnection>
+    <url>http://svn.softec.lu/java/trunk/javascript-maven-tools</url>
   </scm>    
   <repositories>
     <repository>
@@ -106,4 +110,13 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <distributionManagement>
+    <repository>
+      <id>softec-opensource</id>
+      <name>Open Source Release Distribution Repository</name>
+      <url>http://nexus.softec.lu:8081/content/repositories/opensource</url>
+    </repository>
+  </distributionManagement>
+  
 </project>
