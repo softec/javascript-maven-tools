@@ -53,20 +53,26 @@ public class JasmineMojo extends AbstractJasmineMojo {
 
         getLog().info("Executing Jasmine Tests");
         JasmineResult result;
-        try {
-            File runnerFile = writeSpecRunnerToOutputDirectory();
-            result = new SpecRunnerExecutor().execute(runnerFile.toURI().toURL());
-        } catch (Exception e) {
-            throw new MojoExecutionException("There was a problem executing Jasmine specs",e);
+        if(browsers == null) {
+            browsers = new String[] { "FF3.6" };
         }
-        logResults(result);
-        if(!testFailureIgnore && !result.didPass()) {
-            throw new MojoFailureException("There were Jasmine spec failures.");
+        for(String browser : browsers) {
+            try {
+                File runnerFile = writeSpecRunnerToOutputDirectory();
+                result = new SpecRunnerExecutor().execute(runnerFile.toURI().toURL(),browser);
+            } catch (Exception e) {
+                throw new MojoExecutionException("There was a problem executing Jasmine specs",e);
+            }
+            logResults(result,browser);
+            if(!testFailureIgnore && !result.didPass()) {
+                throw new MojoFailureException("There were Jasmine spec failures.");
+            }
         }
 	}
 
-	private void logResults(JasmineResult result) {
+	private void logResults(JasmineResult result, String browser) {
 		JasmineResultLogger resultLogger = new JasmineResultLogger();
+        resultLogger.setBrowser(browser);
 		resultLogger.setLog(getLog());
 		resultLogger.log(result);
 	}

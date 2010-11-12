@@ -80,6 +80,13 @@ public abstract class AbstractJasmineMojo extends AbstractMojo {
     protected String libsDirectory;
 
     /**
+     * The Browser simulation used for Unit tests (default to FF3.6)
+     *
+     * @parameter
+     */
+    protected String[] browsers;
+
+    /**
      * Use the artifactId as folder
      *
      * @parameter

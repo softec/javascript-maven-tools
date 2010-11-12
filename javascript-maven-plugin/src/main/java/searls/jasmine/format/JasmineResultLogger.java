@@ -28,23 +28,29 @@ public class JasmineResultLogger {
 
 	public static final String HEADER="\n"+
 		"-------------------------------------------------------\n"+
-		" J A S M I N E   T E S T S\n"+
+		" J A S M I N E   T E S T S  -  %BROWSER%\n" +
 		"-------------------------------------------------------";
 	public static final String FAIL_APPENDAGE = " <<< FAILURE!";
 	public static final String INDENT = "  ";
 	
 	private Log log;
 
-	public void setLog(Log log) {
+    private String browser;
+
+    public void setLog(Log log) {
 		this.log = log;
 	}
 
 	public void log(JasmineResult result) {
-		log.info(HEADER);
+		log.info(HEADER.replaceAll("%BROWSER%",browser));
 		
 		log.info(result.getDetails());
 
-		log.info("\nResults:\n\n"+result.getDescription()+"\n");		
+		log.info("\nResults:\n\n"+result.getDescription()+"\n");
 	}
 
+    public void setBrowser(String browser)
+    {
+        this.browser = browser;
+    }
 }
