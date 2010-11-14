@@ -58,14 +58,16 @@ public class SpecRunnerHtmlGenerator {
 	private final File sourceDir;
 	private final File specDir;
     private final File libDir;
+    private final File baseDir;
 	private List<String> sourcesToLoadFirst;
 	private List<File> fileNamesAlreadyWrittenAsScriptTags = new ArrayList<File>();
 
-	public SpecRunnerHtmlGenerator(List<String> sourcesToLoadFirst, File sourceDir, File specDir, File libDir) {
+	public SpecRunnerHtmlGenerator(List<String> sourcesToLoadFirst, File sourceDir, File specDir, File libDir, File baseDir) {
 		this.sourcesToLoadFirst = sourcesToLoadFirst;
 		this.sourceDir = sourceDir;
 		this.specDir = specDir;
         this.libDir = libDir;
+        this.baseDir = baseDir;
 	}
 
 	public String generate(List<Artifact> dependencies, ReporterType reporterType) {
@@ -134,10 +136,44 @@ public class SpecRunnerHtmlGenerator {
 	private void appendScriptTagsForFiles(StringBuilder sb, List<File> sourceFiles) throws MalformedURLException {
 		for (File sourceFile : sourceFiles) {
 			if(!fileNamesAlreadyWrittenAsScriptTags.contains(sourceFile)) {
-				sb.append("<script type=\"text/javascript\" src=\"").append(sourceFile.toURI().toURL().toString()).append("\"></script>");
+				sb.append("<script type=\"text/javascript\" src=\"").append(findRelativePath(baseDir,sourceFile)).append("\"></script>");
 				fileNamesAlreadyWrittenAsScriptTags.add(sourceFile);
 			}
 		}
 	}
-	
+
+    /**
+     * Build a relative file to the given base path.
+     *
+     * @param base - the file used as the base
+     * @param file - the file to compute relative to the base path
+     * @return A relative path from base to file
+     */
+    public static String findRelativePath(File base, File file) throws MalformedURLException
+    {
+        String a = ( base == null ) ? ":" : base.toURI().getPath();
+        String b = file.getParentFile().toURI().getPath();
+        String[] basePaths = a.split("/");
+        String[] otherPaths = b.split("/");
+        int n = 0;
+        for (; n < basePaths.length && n < otherPaths.length; n++) {
+            if (basePaths[n].equals(otherPaths[n]) == false) {
+                break;
+            }
+        }
+        if( n == 0 ) {
+            return file.toURI().toURL().toString();
+        }
+
+        StringBuffer tmp = new StringBuffer();
+        for (int m = n; m < basePaths.length; m++) {
+            tmp.append("../");
+        }
+        for (int m = n; m < otherPaths.length; m++) {
+            tmp.append(otherPaths[m]).append("/");
+        }
+        tmp.append(file.getName());
+
+        return tmp.toString();
+    }
 }

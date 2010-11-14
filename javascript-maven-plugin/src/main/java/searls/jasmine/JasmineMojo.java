@@ -79,7 +79,7 @@ public class JasmineMojo extends AbstractJasmineMojo {
 
 	private File writeSpecRunnerToOutputDirectory() throws IOException {
 		SpecRunnerHtmlGenerator htmlGenerator = new SpecRunnerHtmlGenerator(preloadSources,new File(jasmineTargetDir,srcDirectoryName),new File(
-            jasmineTargetDir,specDirectoryName),new File(jasmineTargetDir,libsDirectory));
+            jasmineTargetDir,specDirectoryName),new File(jasmineTargetDir,libsDirectory), jasmineTargetDir);
 		String html = htmlGenerator.generate(pluginArtifacts, ReporterType.JsApiReporter);
 		
 		getLog().debug("Writing out Spec Runner HTML " + html + " to directory " + jasmineTargetDir);

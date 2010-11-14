@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class SpecRunnerHtmlGeneratorTest {
 
-	@InjectMocks private SpecRunnerHtmlGenerator specRunnerHtmlGenerator = new SpecRunnerHtmlGenerator(null,null,null,null);
+	@InjectMocks private SpecRunnerHtmlGenerator specRunnerHtmlGenerator = new SpecRunnerHtmlGenerator(null,null,null,null,null);
 	@Mock private FileUtilsWrapper fileUtilsWrapper; 
 	
 	@Test
