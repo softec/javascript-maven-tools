@@ -5,9 +5,19 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>javascript-maven-plugin</artifactId>
         <configuration>
-          <webappDirectory>${basedir}/target/test-target</webappDirectory>
-          <scripts>compress</scripts>
-          <classifier>compressed</classifier>
+          <project implementation="org.apache.maven.plugin.testing.stubs.MavenProjectStub">
+            <artifact implementation="org.codehaus.mojo.javascript.stub.ArtifactStub">
+                <groupId>test</groupId>
+                <artifactId>test</artifactId>
+                <version>1</version>
+                <type>javascript</type>
+            </artifact>
+            <file>${basedir}/src/test/resources/compressed.pom</file>
+          </project>
+          <scriptsDirectory>${basedir}/src/test/resources/scripts</scriptsDirectory>
+          <strippedDirectory>${basedir}/target/test-target/attach-compressed</strippedDirectory>
+          <compressedDirectory>${basedir}/target/test-target/attach-compressed</compressedDirectory>
+          <optimizationLevel>9</optimizationLevel>
           <compressor>jsmin</compressor>
         </configuration>
       </plugin>

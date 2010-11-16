@@ -1,6 +1,8 @@
-package org.codehaus.mojo.javascript;
-
 /*
+ * Derivative Work
+ * Copyright 2010 SOFTEC sa. All rights reserved.
+ *
+ * Original Work
  * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,64 +18,72 @@ package org.codehaus.mojo.javascript;
  * limitations under the License.
  */
 
+package org.codehaus.mojo.javascript;
+
 import java.io.File;
 
 /**
- * Goal to be used from a war project, to compress the scripts present in the
- * webapp packaging folder. Configured to run in the test phase as there is no
- * way (in maven 2.0) to run between exploded webapp assembly and .war
- * packaging.
- * 
- * @goal war-compress
- * @phase test
- * @author <a href="mailto:nicolas@apache.org">nicolas De Loof</a>
+ * Goal used to strip and compress the JavaScript files from the target script directory
+ *
+ * @goal compress
+ * @phase prepare-package
  */
-public class WebappCompressMojo
+public class CompressMojo
     extends AbstractCompressMojo
 {
-
     /**
-     * The directory where the webapp is built.
-     * 
-     * @parameter expression="${project.build.directory}/${project.build.finalName}"
-     * @required
+     * The output directory of the compressed javascript files.
+     *
+     * @parameter default-value="${project.build.directory}/compressed"
      */
-    private File webappDirectory;
+    private File compressedDirectory;
 
     /**
-     * Folder in webapp containing javascripts
-     * 
-     * @parameter default-value="scripts"
+     * The output directory of the compressed javascript files.
+     *
+     * @parameter default-value="${project.build.directory}/stripped"
      */
-    private String scripts;
+    private File strippedDirectory;
 
     /**
-     * classifier for the compressed artifact. If not set, compressed script
-     * will replace uncompressed ones, and will apply without any change in
-     * HTML/JSP.
-     * 
+     * The output directory of the compressed javascript archive.
+     *
+     * @parameter default-value="${project.build.directory}"
+     */
+    private File buildDirectory;
+
+    /**
+     * optional extension for the compressed artifact. Example "compressed"
+     *
      * @parameter
      */
-    private String classifier;
+    private String scriptClassifier;
+
+    /**
+     * The intput directory for the source javascript files.
+     *
+     * @parameter default-value="${project.build.outputDirectory}"
+     */
+    private File scriptsDirectory;
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.codehaus.mojo.javascript.AbstractCompressMojo#getExtension()
      */
     public String getExtension()
     {
-        return classifier;
+        return scriptClassifier;
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.codehaus.mojo.javascript.AbstractCompressMojo#getOutputDirectory()
      */
     protected File getOutputDirectory()
     {
-        return getSourceDirectory();
+        return compressedDirectory;
     }
 
     /**
@@ -83,17 +93,16 @@ public class WebappCompressMojo
      */
     protected File getStrippedDirectory()
     {
-        return getSourceDirectory();
+        return strippedDirectory;
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.codehaus.mojo.javascript.AbstractCompressMojo#getSourceDirectory()
      */
     protected File getSourceDirectory()
     {
-        return new File( webappDirectory, scripts );
+        return scriptsDirectory;
     }
-
 }

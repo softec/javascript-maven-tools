@@ -166,9 +166,17 @@ public abstract class AbstractCompressMojo
     private String[] excludes;
 
     /**
-     * A special token to recognize lines to be removed from scripts (debugging
+     * A list of special token to recognize lines to be removed from scripts (debugging
      * code).
      * 
+     * @parameter
+     */
+    private String[] strips;
+
+    /**
+     * A special token to recognize lines to be removed from scripts (debugging
+     * code).
+     *
      * @parameter
      */
     private String strip;
@@ -219,39 +227,67 @@ public abstract class AbstractCompressMojo
         logStats( "compression saved " + INTEGER.format( saved ) + " bytes" );
     }
 
-    private File stripDebugs( File file )
+    private File stripDebugs( String name, File file )
         throws MojoExecutionException
     {
-        if ( strip == null )
+        if ( strip == null && (strips == null || strips.length == 0))
         {
             return file;
         }
+
+        File stripped = new File( getStrippedDirectory(), name );
+        stripped.getParentFile().mkdirs();
+        if ( file.equals( stripped ) )
+        {
+            try
+            {
+                File temp = File.createTempFile( "stripped", ".js" );
+                stripDebugs(file, temp);
+                FileUtils.copyFile( temp, file );
+                temp.delete();
+                return file;
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( "Error creating temp file for stripping", e );
+            }
+        }
+        else
+        {
+            stripDebugs(file, stripped);
+            return stripped;
+        }
+    }
+
+    private void stripDebugs( File file, File stripped )
+            throws MojoExecutionException
+    {
         try
         {
-
-            File stripped = File.createTempFile( "stripped", ".js" );
-
             BufferedReader reader = new BufferedReader( new FileReader( file ) );
             PrintWriter writer = new PrintWriter( stripped );
             String line;
             while ( ( line = reader.readLine() ) != null )
             {
-                if ( !line.trim().startsWith( strip ) )
+                String trimmed = line.trim();
+                boolean stripLine = (strip == null || trimmed.startsWith( strip ));
+                if( strips != null ) {
+                    for( int i=0, len = strips.length; !stripLine && i < len; i++ ) {
+                        stripLine |= trimmed.startsWith( strips[i] );
+                    }
+                }
+                if ( !stripLine )
                 {
                     writer.println( line );
                 }
             }
             IOUtil.close( reader );
             IOUtil.close( writer );
-
-            FileUtils.copyFile( stripped, file );
-            stripped.delete();
         }
         catch ( IOException e )
         {
             throw new MojoExecutionException( "Failed to strip debug code in " + file, e );
         }
-        return file;
     }
 
     private JSCompressor getCompressor()
@@ -343,7 +379,7 @@ public abstract class AbstractCompressMojo
             try
             {
                 File temp = File.createTempFile( "compress", ".js" );
-                long size = compress( in, temp, jscompressor );
+                long size = compress( name, in, temp, jscompressor );
                 FileUtils.copyFile( temp, compressed );
                 temp.delete();
                 return size;
@@ -355,16 +391,16 @@ public abstract class AbstractCompressMojo
         }
         else
         {
-            return compress( in, compressed, jscompressor );
+            return compress( name, in, compressed, jscompressor );
         }
     }
 
-    private long compress( File in, File compressed, JSCompressor jscompressor )
+    private long compress( String name, File in, File compressed, JSCompressor jscompressor )
         throws MojoExecutionException
     {
         if ( in.length() > 0 )
         {
-            File stripped = stripDebugs( in );
+            File stripped = stripDebugs( name, in );
             try
             {
                 jscompressor.compress( stripped, compressed, optimizationLevel, languageVersion );
@@ -422,6 +458,11 @@ public abstract class AbstractCompressMojo
      * @return the outputDirectory
      */
     protected abstract File getOutputDirectory();
+
+    /**
+     * @return the outputDirectory
+     */
+    protected abstract File getStrippedDirectory();
 
     /**
      * @return the sourceDirectory

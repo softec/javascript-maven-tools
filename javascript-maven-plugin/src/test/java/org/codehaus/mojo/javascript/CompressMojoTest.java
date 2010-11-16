@@ -29,11 +29,15 @@ public class CompressMojoTest
     public void testAttachCompressedScriptaculous()
         throws Exception
     {
-        File testPom = new File( getBasedir(), "src/test/resources/attach-compressed.pom" );
-        Mojo mojo = (Mojo) lookupMojo( "attach-compressed", testPom );
-        assertNotNull( "Failed to configure the plugin", mojo );
-
-        mojo.execute();
+        File testPom1 = new File( getBasedir(), "src/test/resources/compress.pom" );
+        File testPom2 = new File( getBasedir(), "src/test/resources/attach-compressed.pom" );
+        Mojo mojo1 = (Mojo) lookupMojo( "compress", testPom1 );
+        Mojo mojo2 = (Mojo) lookupMojo( "attach-compressed", testPom2 );
+        assertNotNull( "Failed to configure the plugin (compress)", mojo1 );
+        assertNotNull( "Failed to configure the plugin (attach)", mojo2 );
+ 
+        mojo1.execute();
+        mojo2.execute();
 
         File[] js = getScripts( "./src/test/resources/scripts" );
         long size = 0;
@@ -51,13 +55,13 @@ public class CompressMojoTest
     public void testCompressScriptaculous()
         throws Exception
     {
-        File target = new File( "target/test-target/compress" );
+        File target = new File( "target/test-target/war-compress" );
         target.mkdirs();
         FileUtils.cleanDirectory( target );
         FileUtils.copyDirectory( new File( "src/test/resources/scripts" ), target );
 
-        File testPom = new File( getBasedir(), "/target/test-classes/compress.pom" );
-        Mojo mojo = (Mojo) lookupMojo( "compress", testPom );
+        File testPom = new File( getBasedir(), "/target/test-classes/war-compress.pom" );
+        Mojo mojo = (Mojo) lookupMojo( "war-compress", testPom );
         assertNotNull( "Failed to configure the plugin", mojo );
 
         mojo.execute();
@@ -81,7 +85,7 @@ public class CompressMojoTest
         FileUtils.copyDirectory( new File( "src/test/resources/zero-length" ), target );
 
         File testPom = new File( getBasedir(), "/target/test-classes/compress-zero-length.pom" );
-        Mojo mojo = (Mojo) lookupMojo( "compress", testPom );
+        Mojo mojo = (Mojo) lookupMojo( "war-compress", testPom );
         assertNotNull( "Failed to configure the plugin", mojo );
 
         mojo.execute();
