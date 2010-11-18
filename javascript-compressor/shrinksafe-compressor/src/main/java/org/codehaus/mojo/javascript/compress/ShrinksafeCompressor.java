@@ -17,16 +17,18 @@ package org.codehaus.mojo.javascript.compress;
  */
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringOutputStream;
+import org.dojotoolkit.shrinksafe.Compressor;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextAction;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.tools.ToolErrorReporter;
 import org.mozilla.javascript.tools.shell.Global;
-import org.mozilla.javascript.tools.shell.Main;
 import org.mozilla.javascript.tools.shell.ShellContextFactory;
 
 /**
@@ -48,19 +50,16 @@ public class ShrinksafeCompressor
     public void compress( final File input, File compressed, int level, int language )
         throws CompressionException
     {
-        PrintStream o = System.out;
-        System.setOut( new PrintStream( new StringOutputStream() ) );
         PrintStream out = null;
         try
         {
-            String[] args = new String[3];
-            args[0] = "-c"; // Set Main.outputCompressed = true
-            args[1] = "-o"; // Set Main.outputFileName
-            args[2] = compressed.getAbsolutePath();
+            out = new PrintStream( new FileOutputStream(compressed) );
 
-            Main.processOptions( args );
+            final Global global = new Global();
+            global.setErr(System.err);
+            global.setOut(out);
 
-            final ToolErrorReporter errorReporter = new ToolErrorReporter( false, System.err );
+            final ToolErrorReporter errorReporter = new ToolErrorReporter( false, global.getErr() );
             errorReporter.setIsReportingWarnings( false );
 
             final ShellContextFactory shellContextFactory = new ShellContextFactory();
@@ -69,16 +68,21 @@ public class ShrinksafeCompressor
             shellContextFactory.setErrorReporter( errorReporter );
             shellContextFactory.setStrictMode( true );
 
-            final Global scope = new Global();
-            scope.init( shellContextFactory );
+            global.init(shellContextFactory);
 
             shellContextFactory.call( new ContextAction()
             {
                 public Object run( Context context )
                 {
                     Object[] args = new Object[1];
-                    scope.defineProperty( "arguments", args, ScriptableObject.DONTENUM );
-                    Main.processFile( context, scope, input.getAbsolutePath() );
+                    global.defineProperty( "arguments", args, ScriptableObject.DONTENUM );
+                    try {
+                        global.getOut().println(
+                            Compressor.compressScript(FileUtils.readFileToString(input), 0, 1, false, null));
+                    } catch (IOException ioe) {
+					    Context.reportError(ioe.toString());
+				    }
+
                     return null;
                 }
             } );
@@ -89,7 +93,6 @@ public class ShrinksafeCompressor
         }
         finally
         {
-            System.setOut( o );
             IOUtil.close( out );
         }
     }
