@@ -136,7 +136,7 @@ public class SpecRunnerHtmlGenerator {
 	private void appendScriptTagsForFiles(StringBuilder sb, List<File> sourceFiles) throws MalformedURLException {
 		for (File sourceFile : sourceFiles) {
 			if(!fileNamesAlreadyWrittenAsScriptTags.contains(sourceFile)) {
-				sb.append("<script type=\"text/javascript\" src=\"").append(findRelativePath(baseDir,sourceFile)).append("\"></script>");
+				sb.append("<script type=\"text/javascript\" charset=\"utf-8\" src=\"").append(findRelativePath(baseDir,sourceFile)).append("\"></script>");
 				fileNamesAlreadyWrittenAsScriptTags.add(sourceFile);
 			}
 		}
