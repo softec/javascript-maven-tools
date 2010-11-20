@@ -45,7 +45,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.javascript.compress.CompressionException;
 import org.codehaus.mojo.javascript.compress.IsolatedClassLoader;
 import org.codehaus.mojo.javascript.compress.JSCompressor;
-import org.codehaus.mojo.javascript.compress.JSCompressorProxy;
 import org.codehaus.mojo.javascript.compress.JSMinCompressor;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
@@ -327,7 +326,8 @@ public abstract class AbstractCompressMojo
                 + compressorArtifact.toString(), e );
         }
 
-        IsolatedClassLoader classLoader = new IsolatedClassLoader( dependencies.getArtifacts() );
+        IsolatedClassLoader classLoader = new IsolatedClassLoader( dependencies.getArtifacts(),
+            this.getClass().getClassLoader() );
 
         compressor = StringUtils.capitalize( compressor );
         String compressorClassName =
@@ -347,7 +347,8 @@ public abstract class AbstractCompressMojo
         JSCompressor jscompressor;
         try
         {
-            jscompressor = new JSCompressorProxy( compressorClass.newInstance() );
+            jscompressor = (JSCompressor) compressorClass.newInstance();
+            jscompressor.setLogger(new MojoJSCompressorLogger(getLog()));
         }
         catch ( Exception e )
         {

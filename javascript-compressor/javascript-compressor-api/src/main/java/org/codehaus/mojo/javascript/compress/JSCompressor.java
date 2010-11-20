@@ -41,6 +41,20 @@ public interface JSCompressor
     int JAVASCRIPT_1_3 = 130;
 
     /**
+     * Set a the JSCompressorLogger implementation that will receive logs
+     * @param logger a logger
+     */
+    void setLogger(JSCompressorLogger logger)
+        throws CompressionException;
+
+    /**
+     * Return current JSCompressorLogger used for logging
+     * @return the current JSCompressorLogger used for logging
+     */
+    JSCompressorLogger getLogger()
+        throws CompressionException;
+
+    /**
      * Compress the input script file into the output file (may be same).
      * 
      * @param input source to get compressed

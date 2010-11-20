@@ -19,12 +19,12 @@ package org.codehaus.mojo.javascript.compress;
 import java.io.File;
 import java.net.URL;
 
-import junit.framework.TestCase;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.codehaus.plexus.PlexusTestCase;
+
+import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:nicolas@apache.org">Nicolas De Loof</a>
@@ -61,7 +61,7 @@ public class IsolatedClassLoaderTest
 
         // setup the isolated classloader
         artifact.setFile( new File( url.getFile() ) );
-        ClassLoader cl = new IsolatedClassLoader( artifact );
+        ClassLoader cl = new IsolatedClassLoader( artifact, this.getClassLoader() );
 
         Class isolated = cl.loadClass( "junit.framework.TestCase" );
         assertNotNull( "failed to load TestCase class in isolation", isolated );

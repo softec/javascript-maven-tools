@@ -21,8 +21,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 
 import org.codehaus.plexus.util.IOUtil;
-import org.mozilla.javascript.ErrorReporter;
-import org.mozilla.javascript.EvaluatorException;
 
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
@@ -36,65 +34,51 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 public class YahooUICompressor
     implements JSCompressor
 {
+    ErrorReporter4Mojo log = null;
+
+    /**
+     * Set a the JSCompressorLogger implementation that will receive logs
+     *
+     * @param logger a logger
+     */
+    public void setLogger(JSCompressorLogger logger) throws CompressionException
+    {
+        log = new ErrorReporter4Mojo(logger,true);
+    }
+
+    /**
+     * Return current JSCompressorLogger used for logging
+     *
+     * @return the current JSCompressorLogger used for logging
+     */
+    public JSCompressorLogger getLogger() throws CompressionException
+    {
+        return log.getLogger();
+    }
+
     /**
      * {@inheritDoc}
      * 
      * @see org.codehaus.mojo.javascript.compress.JSCompressor#compress(java.io.File,
      * java.io.File, int, int)
      */
-    public void compress( final File input, File compressed, int level, int language )
+    public void compress( final File input, File compressed, int level, int language)
         throws CompressionException
     {
         FileWriter out = null;
         try
         {
             JavaScriptCompressor compressor =
-                new JavaScriptCompressor( new FileReader( input ), new ErrorReporter()
-                {
+                new JavaScriptCompressor( new FileReader( input ), log );
 
-                    public void warning( String message, String sourceName, int line,
-                                         String lineSource, int lineOffset )
-                    {
-                        if ( line < 0 )
-                        {
-                            System.err.println( "\n[WARNING] " + message );
-                        }
-                        else
-                        {
-                            System.err.println( "\n" + line + ':' + lineOffset + ':' + message );
-                        }
-                    }
-
-                    public void error( String message, String sourceName, int line,
-                                       String lineSource, int lineOffset )
-                    {
-                        if ( line < 0 )
-                        {
-                            System.err.println( "\n[ERROR] " + message );
-                        }
-                        else
-                        {
-                            System.err.println( "\n" + line + ':' + lineOffset + ':' + message );
-                        }
-                    }
-
-                    public EvaluatorException runtimeError( String message, String sourceName,
-                                                            int line, String lineSource,
-                                                            int lineOffset )
-                    {
-                        error( message, sourceName, line, lineSource, lineOffset );
-                        return new EvaluatorException( message );
-                    }
-                } );
-
-            int linebreakpos = level < 4 ? -1 : 80;
-            boolean munge = level < 3;
+            int linebreakpos = (level < 6) ? 0 : (level < 9) ? 120 : -1;
+            boolean nomunge = level < 3;
+            level = (level>2) ? ((level>5) ? level-6 : level-3) : level;
             boolean preserveAllSemiColons = level < 2;
-            boolean preserveStringLiterals = level < 1;
+            boolean disableOptimizations = level < 1;
 
             out = new FileWriter( compressed );
-            compressor.compress( out, linebreakpos, munge, true, preserveAllSemiColons,
-                preserveStringLiterals );
+            compressor.compress( out, linebreakpos, !nomunge, true, preserveAllSemiColons, disableOptimizations );
         }
         catch ( Exception e )
         {

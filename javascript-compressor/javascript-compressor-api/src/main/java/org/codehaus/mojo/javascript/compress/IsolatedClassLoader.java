@@ -31,14 +31,14 @@ public class IsolatedClassLoader
     extends URLClassLoader
 {
 
-    public IsolatedClassLoader( Artifact artifact )
+    public IsolatedClassLoader( Artifact artifact, ClassLoader parent )
     {
-        super( getArtifactURLs( artifact ) );
+        super( getArtifactURLs( artifact ), parent );
     }
 
-    public IsolatedClassLoader( Collection artifacts )
+    public IsolatedClassLoader( Collection artifacts, ClassLoader parent )
     {
-        super( getArtifactURLs( artifacts ) );
+        super( getArtifactURLs( artifacts ), parent );
     }
 
     private static URL[] getArtifactURLs( Collection artifacts )
@@ -77,7 +77,6 @@ public class IsolatedClassLoader
     public Class loadClass( String name )
         throws ClassNotFoundException
     {
-
         Class c = findLoadedClass( name );
         if ( c == null )
         {

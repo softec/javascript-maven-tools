@@ -17,18 +17,12 @@ package org.codehaus.mojo.javascript.compress;
  */
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 
-import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.dojotoolkit.shrinksafe.Compressor;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextAction;
-import org.mozilla.javascript.ScriptableObject;
-import org.mozilla.javascript.tools.ToolErrorReporter;
-import org.mozilla.javascript.tools.shell.Global;
 import org.mozilla.javascript.tools.shell.ShellContextFactory;
 
 /**
@@ -41,6 +35,28 @@ import org.mozilla.javascript.tools.shell.ShellContextFactory;
 public class ShrinksafeCompressor
     implements JSCompressor
 {
+    private ErrorReporter4Mojo log = null;
+
+    /**
+     * Set a the JSCompressorLogger implementation that will receive logs
+     *
+     * @param logger a logger
+     */
+    public void setLogger(JSCompressorLogger logger) throws CompressionException
+    {
+        log = new ErrorReporter4Mojo(logger,true);
+    }
+
+    /**
+     * Return current JSCompressorLogger used for logging
+     *
+     * @return the current JSCompressorLogger used for logging
+     */
+    public JSCompressorLogger getLogger() throws CompressionException
+    {
+        return log.getLogger();
+    }
+
     /**
      * {@inheritDoc}
      * 
@@ -50,42 +66,21 @@ public class ShrinksafeCompressor
     public void compress( final File input, File compressed, int level, int language )
         throws CompressionException
     {
-        PrintStream out = null;
+        final ShellContextFactory shellContextFactory = new ShellContextFactory();
+        shellContextFactory.setLanguageVersion( language );
+        shellContextFactory.setOptimizationLevel( level );
+        if( log != null ) {
+            shellContextFactory.setErrorReporter( log );
+        }
+        shellContextFactory.setStrictMode( true );
+
+        Context cx = shellContextFactory.enterContext();
+
+        FileWriter out = null;
         try
         {
-            out = new PrintStream( new FileOutputStream(compressed) );
-
-            final Global global = new Global();
-            global.setErr(System.err);
-            global.setOut(out);
-
-            final ToolErrorReporter errorReporter = new ToolErrorReporter( false, global.getErr() );
-            errorReporter.setIsReportingWarnings( false );
-
-            final ShellContextFactory shellContextFactory = new ShellContextFactory();
-            shellContextFactory.setLanguageVersion( language );
-            shellContextFactory.setOptimizationLevel( level );
-            shellContextFactory.setErrorReporter( errorReporter );
-            shellContextFactory.setStrictMode( true );
-
-            global.init(shellContextFactory);
-
-            shellContextFactory.call( new ContextAction()
-            {
-                public Object run( Context context )
-                {
-                    Object[] args = new Object[1];
-                    global.defineProperty( "arguments", args, ScriptableObject.DONTENUM );
-                    try {
-                        global.getOut().println(
-                            Compressor.compressScript(FileUtils.readFileToString(input), 0, 1, false, null));
-                    } catch (IOException ioe) {
-					    Context.reportError(ioe.toString());
-				    }
-
-                    return null;
-                }
-            } );
+            out = new FileWriter( compressed );
+            out.write(Compressor.compressScript(new FileReader(input)));
         }
         catch ( Exception e )
         {
@@ -93,6 +88,7 @@ public class ShrinksafeCompressor
         }
         finally
         {
+            Context.exit();
             IOUtil.close( out );
         }
     }

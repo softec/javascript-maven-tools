@@ -26,6 +26,8 @@
 
  package org.dojotoolkit.shrinksafe;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -970,16 +972,34 @@ public class Compressor {
         }
         return (sb == null) ? s : sb.toString();
     }
-    
-    public static final String compressScript(String source, int indent, int lineno, String stripConsole) {
+
+    public static final String compressScript(Reader source)
+        throws IOException
+    {
+    	return compressScript(source, 0, 1, false, null);
+    }
+
+    public static final String compressScript(Reader source, String stripConsole)
+        throws IOException
+    {
+    	return compressScript(source, 0, 1, false, stripConsole);
+    }
+
+    public static final String compressScript(Reader source, int indent, int lineno, String stripConsole)
+        throws IOException
+    {
     	return compressScript(source, indent, lineno, false, stripConsole);
     }
     
-    public static final String compressScript(String source, int indent, int lineno, boolean escapeUnicode, String stripConsole) {
+    public static final String compressScript(Reader source, int indent, int lineno, boolean escapeUnicode, String stripConsole)
+        throws IOException
+    {
     	return compressScript(source, indent, lineno, escapeUnicode, stripConsole, null);
     }
         
-    public static final String compressScript(String source, int indent, int lineno, boolean escapeUnicode, String stripConsole, StringBuffer debugData) {
+    public static final String compressScript(Reader source, int indent, int lineno, boolean escapeUnicode, String stripConsole, StringBuffer debugData)
+        throws IOException
+    {
         CompilerEnvirons compilerEnv = new CompilerEnvirons();
 
         Parser parser = new Parser(compilerEnv, compilerEnv.getErrorReporter());

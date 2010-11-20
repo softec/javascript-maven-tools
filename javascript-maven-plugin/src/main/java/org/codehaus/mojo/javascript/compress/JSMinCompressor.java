@@ -52,4 +52,23 @@ public class JSMinCompressor
         }
     }
 
+    /**
+     * Set a the JSCompressorLogger implementation that will receive logs
+     *
+     * @param logger a logger
+     */
+    public void setLogger(JSCompressorLogger logger) throws CompressionException
+    {
+        // Unused
+    }
+
+    /**
+     * Return current JSCompressorLogger used for logging
+     *
+     * @return the current JSCompressorLogger used for logging
+     */
+    public JSCompressorLogger getLogger() throws CompressionException
+    {
+        return null;  // Unused
+    }
 }
