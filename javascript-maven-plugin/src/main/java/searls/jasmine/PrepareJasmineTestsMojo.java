@@ -67,15 +67,20 @@ public class PrepareJasmineTestsMojo extends AbstractJasmineMojo
         scanner.addDefaultExcludes();
         try
         {
-            File destDir = new File(jasmineTargetDir, srcDirectoryName);
-            scanner.setBasedir( sourceDirectory );
-            scanner.scan();
-            String[] files = scanner.getIncludedFiles();
-            for ( int i = 0; i < files.length; i++ )
-            {
-                File destFile = new File( destDir, files[i] );
-                destFile.getParentFile().mkdirs();
-                FileUtils.copyFile( new File( sourceDirectory, files[i] ), destFile );
+            File destDir;
+            String[] files;
+
+            if( sourceDirectory.exists() ) {
+                destDir = new File(jasmineTargetDir, srcDirectoryName);
+                scanner.setBasedir( sourceDirectory );
+                scanner.scan();
+                files = scanner.getIncludedFiles();
+                for ( int i = 0; i < files.length; i++ )
+                {
+                    File destFile = new File( destDir, files[i] );
+                    destFile.getParentFile().mkdirs();
+                    FileUtils.copyFile( new File( sourceDirectory, files[i] ), destFile );
+                }
             }
 
             destDir = new File(jasmineTargetDir, specDirectoryName);

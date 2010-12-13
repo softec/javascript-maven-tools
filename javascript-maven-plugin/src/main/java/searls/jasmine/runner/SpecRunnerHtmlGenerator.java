@@ -104,7 +104,9 @@ public class SpecRunnerHtmlGenerator {
 			throws IOException {
 		StringBuilder scriptTags = new StringBuilder();
 		appendScriptTagsForFiles(scriptTags, expandSourcesToLoadFirst());
-		appendScriptTagsForFiles(scriptTags, filesForScriptsInDirectory(sourceDir));
+        if( sourceDir.exists() ) {
+    		appendScriptTagsForFiles(scriptTags, filesForScriptsInDirectory(sourceDir));
+        }
 		appendScriptTagsForFiles(scriptTags, filesForScriptsInDirectory(specDir));
 		template.setAttribute(SOURCES_TEMPLATE_ATTR_NAME,scriptTags.toString());
 	}

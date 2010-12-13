@@ -20,17 +20,6 @@ package org.codehaus.mojo.javascript;
  * limitations under the License.
  */
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.NumberFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -49,6 +38,13 @@ import org.codehaus.mojo.javascript.compress.JSMinCompressor;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+
+import java.io.*;
+import java.text.NumberFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Abstact mojo for compressing JavaScripts.
@@ -269,10 +265,10 @@ public abstract class AbstractCompressMojo
             while ( ( line = reader.readLine() ) != null )
             {
                 String trimmed = line.trim();
-                boolean stripLine = (strip == null || trimmed.startsWith( strip ));
+                boolean stripLine = (strip != null && trimmed.startsWith( strip ));
                 if( strips != null ) {
                     for( int i=0, len = strips.length; !stripLine && i < len; i++ ) {
-                        stripLine |= trimmed.startsWith( strips[i] );
+                        stripLine = trimmed.startsWith( strips[i] );
                     }
                 }
                 if ( !stripLine )

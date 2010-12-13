@@ -58,7 +58,7 @@ public class GenerateManualRunnerMojo extends AbstractJasmineMojo {
 
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		if(sourceDirectory.exists() && jasmineTestSourceDirectory.exists()) {
+		if(jasmineTestSourceDirectory.exists()) {
             try
             {
                 javascriptArtifactManager.unpack( project, DefaultArtifact.SCOPE_TEST, new File(
@@ -77,8 +77,7 @@ public class GenerateManualRunnerMojo extends AbstractJasmineMojo {
 			}
 		} else {
             if( jasmineTestSourceDirectory.equals(jsunitTestSourceDirectory) ) {
-                getLog().warn("Skipping manual spec runner generation. Check to make sure that both JavaScript directories `"+
-                    sourceDirectory.getAbsolutePath()+"` and `"+ jasmineTestSourceDirectory.getAbsolutePath()+"` exist.");
+                getLog().warn("Skipping manual spec runner generation. Check to make sure that `"+ jasmineTestSourceDirectory.getAbsolutePath()+"` exist.");
             }
 		}
 	}
