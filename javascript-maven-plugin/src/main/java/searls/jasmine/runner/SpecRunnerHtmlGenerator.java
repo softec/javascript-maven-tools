@@ -20,18 +20,17 @@
 
 package searls.jasmine.runner;
 
+import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.stringtemplate.language.DefaultTemplateLexer;
+import org.apache.maven.artifact.Artifact;
+import searls.jasmine.io.FileUtilsWrapper;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.language.DefaultTemplateLexer;
-import org.apache.maven.artifact.Artifact;
-
-import searls.jasmine.io.FileUtilsWrapper;
 
 public class SpecRunnerHtmlGenerator {
 	
@@ -41,14 +40,17 @@ public class SpecRunnerHtmlGenerator {
 	private static final String JAVASCRIPT_DEPENDENCIES_TEMPLATE_ATTR_NAME = "javascriptDependencies";	
 	private static final String SOURCES_TEMPLATE_ATTR_NAME = "sources";
 	private static final String REPORTER_ATTR_NAME = "reporter";
-	private static final String RUNNER_HTML_TEMPLATE = 
-		"<html>" +
-		"<head><title>Jasmine Test Runner</title>" +
-		"$"+CSS_DEPENDENCIES_TEMPLATE_ATTR_NAME+"$ " +
-		"$"+JAVASCRIPT_DEPENDENCIES_TEMPLATE_ATTR_NAME+"$ " +
-		"$"+SOURCES_TEMPLATE_ATTR_NAME+"$ " +
-		"</head>" +
-		"<body><script type=\"text/javascript\">var reporter = new jasmine.$"+REPORTER_ATTR_NAME+"$(); jasmine.getEnv().addReporter(reporter); jasmine.getEnv().execute();</script></body>" +
+	private static final String RUNNER_HTML_TEMPLATE =
+        "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n" +
+		"<html>\n" +
+		"<head><title>Jasmine Test Runner</title>\n" +
+		"$"+CSS_DEPENDENCIES_TEMPLATE_ATTR_NAME+"$\n" +
+		"$"+JAVASCRIPT_DEPENDENCIES_TEMPLATE_ATTR_NAME+"$\n" +
+		"$"+SOURCES_TEMPLATE_ATTR_NAME+"$\n" +
+		"</head>\n" +
+		"<body>\n"+
+        "<script type=\"text/javascript\">var reporter = new jasmine.$"+REPORTER_ATTR_NAME+"$(); jasmine.getEnv().addReporter(reporter); jasmine.getEnv().execute();</script>" +
+        "\n</body>\n" +
 		"</html>";
 	
 	public enum ReporterType { TrivialReporter, JsApiReporter };
@@ -91,9 +93,9 @@ public class SpecRunnerHtmlGenerator {
 		StringBuilder cssDependencies = new StringBuilder();
 		for(Artifact dep : dependencies) {
 			if(JAVASCRIPT_TYPE.equals(dep.getType())) {
-				javaScriptDependencies.append("<script type=\"text/javascript\">").append(fileUtilsWrapper.readFileToString(dep.getFile())).append("</script>");
+				javaScriptDependencies.append("<script type=\"text/javascript\">").append(fileUtilsWrapper.readFileToString(dep.getFile())).append("</script>\n");
 			} else if(CSS_TYPE.equals(dep.getType())) {
-				cssDependencies.append("<style type=\"text/css\">").append(fileUtilsWrapper.readFileToString(dep.getFile())).append("</style>");
+				cssDependencies.append("<style type=\"text/css\">\n").append(fileUtilsWrapper.readFileToString(dep.getFile())).append("\n</style>\n");
 			}
 		}
 		template.setAttribute(JAVASCRIPT_DEPENDENCIES_TEMPLATE_ATTR_NAME, javaScriptDependencies.toString());
@@ -104,7 +106,7 @@ public class SpecRunnerHtmlGenerator {
 			throws IOException {
 		StringBuilder scriptTags = new StringBuilder();
 		appendScriptTagsForFiles(scriptTags, expandSourcesToLoadFirst());
-        if( sourceDir.exists() ) {
+        if( sourceDir != null && sourceDir.exists() ) {
     		appendScriptTagsForFiles(scriptTags, filesForScriptsInDirectory(sourceDir));
         }
 		appendScriptTagsForFiles(scriptTags, filesForScriptsInDirectory(specDir));
@@ -138,7 +140,7 @@ public class SpecRunnerHtmlGenerator {
 	private void appendScriptTagsForFiles(StringBuilder sb, List<File> sourceFiles) throws MalformedURLException {
 		for (File sourceFile : sourceFiles) {
 			if(!fileNamesAlreadyWrittenAsScriptTags.contains(sourceFile)) {
-				sb.append("<script type=\"text/javascript\" charset=\"utf-8\" src=\"").append(findRelativePath(baseDir,sourceFile)).append("\"></script>");
+				sb.append("<script type=\"text/javascript\" charset=\"utf-8\" src=\"").append(findRelativePath(baseDir,sourceFile)).append("\"></script>\n");
 				fileNamesAlreadyWrittenAsScriptTags.add(sourceFile);
 			}
 		}
