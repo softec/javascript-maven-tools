@@ -136,7 +136,7 @@ public abstract class AbstractCompressMojo
 
     /**
      * The compressor to used. Either "shrinksafe", "yahooui" or "jsmin" for default compressor, 
-	 * or a custom one provided as an artifact in repo org.codehaus.mojo.javascript:<xxx>-compressor.
+	 * or a custom one provided as an artifact in repo org.codehaus.mojo.javascript:[xxx]-compressor.
      * 
      * @parameter default-value="jsmin"
      */
@@ -375,7 +375,7 @@ public abstract class AbstractCompressMojo
                     + e.getScript(), e );
             }
             String describe = in.getName() + " (" + INTEGER.format( in.length() ) + " bytes) ";
-            String title = StringUtils.rightPad( describe, 60, "." );
+            String title = StringUtils.rightPad( describe, 50, "." );
             logStats( title + " compressed at " + ratio( compressed, in ) + "%" );
             return in.length() - compressed.length();
         }

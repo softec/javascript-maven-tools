@@ -1,3 +1,23 @@
+/*
+ * Derivative Work
+ * Copyright 2010 SOFTEC sa. All rights reserved.
+ *
+ * Original Work
+ * Copyright 2010 Justin Searls
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package searls.jasmine.runner;
 
 import java.io.File;
@@ -37,13 +57,15 @@ public class SpecRunnerHtmlGenerator {
 	
 	private final File sourceDir;
 	private final File specDir;
+    private final File libDir;
 	private List<String> sourcesToLoadFirst;
 	private List<File> fileNamesAlreadyWrittenAsScriptTags = new ArrayList<File>();
 
-	public SpecRunnerHtmlGenerator(List<String> sourcesToLoadFirst, File sourceDir,File specDir) {
+	public SpecRunnerHtmlGenerator(List<String> sourcesToLoadFirst, File sourceDir, File specDir, File libDir) {
 		this.sourcesToLoadFirst = sourcesToLoadFirst;
 		this.sourceDir = sourceDir;
 		this.specDir = specDir;
+        this.libDir = libDir;
 	}
 
 	public String generate(List<Artifact> dependencies, ReporterType reporterType) {
@@ -79,17 +101,21 @@ public class SpecRunnerHtmlGenerator {
 	private void setJavaScriptSourcesAttribute(StringTemplate template)
 			throws IOException {
 		StringBuilder scriptTags = new StringBuilder();
-		appendScriptTagsForFiles(scriptTags,expandSourcesToLoadFirstRelativeToSourceDir());				
+		appendScriptTagsForFiles(scriptTags, expandSourcesToLoadFirst());
 		appendScriptTagsForFiles(scriptTags, filesForScriptsInDirectory(sourceDir));
 		appendScriptTagsForFiles(scriptTags, filesForScriptsInDirectory(specDir));
 		template.setAttribute(SOURCES_TEMPLATE_ATTR_NAME,scriptTags.toString());
 	}
 
-	private List<File> expandSourcesToLoadFirstRelativeToSourceDir() {
+	private List<File> expandSourcesToLoadFirst() {
 		List<File> files = new ArrayList<File>();
 		if(sourcesToLoadFirst != null) {
 			for(String sourceToLoadFirst : sourcesToLoadFirst) {
-				files.add(new File(sourceDir,sourceToLoadFirst));
+                File file = new File(sourceDir,sourceToLoadFirst);
+                if( !file.exists() ) {
+                    file = new File(libDir,sourceToLoadFirst);
+                }
+                files.add(file);
 			}
 		}
 		return files;

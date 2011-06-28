@@ -25,10 +25,6 @@
 					<execution>
 						<goals>
 							<goal>generateManualRunner</goal>
-							<goal>resources</goal>
-							<goal>testResources</goal>
-							<goal>test</goal>
-							<goal>preparePackage</goal>
 						</goals>
 					</execution>
 				</executions>

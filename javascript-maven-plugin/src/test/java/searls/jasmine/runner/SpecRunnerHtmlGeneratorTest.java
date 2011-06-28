@@ -1,9 +1,5 @@
 package searls.jasmine.runner;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +14,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 import searls.jasmine.io.FileUtilsWrapper;
 import searls.jasmine.runner.SpecRunnerHtmlGenerator.ReporterType;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 @RunWith(MockitoJUnitRunner.class)
 public class SpecRunnerHtmlGeneratorTest {
 
-	@InjectMocks private SpecRunnerHtmlGenerator specRunnerHtmlGenerator = new SpecRunnerHtmlGenerator(null,null,null);
+	@InjectMocks private SpecRunnerHtmlGenerator specRunnerHtmlGenerator = new SpecRunnerHtmlGenerator(null,null,null,null);
 	@Mock private FileUtilsWrapper fileUtilsWrapper; 
 	
 	@Test

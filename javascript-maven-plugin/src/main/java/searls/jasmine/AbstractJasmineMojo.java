@@ -1,3 +1,23 @@
+/*
+ * Derivative Work
+ * Copyright 2010 SOFTEC sa. All rights reserved.
+ *
+ * Original Work
+ * Copyright 2010 Justin Searls
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package searls.jasmine;
 
 import java.io.File;
@@ -8,19 +28,25 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.project.MavenProject;
 
 public abstract class AbstractJasmineMojo extends AbstractMojo {
-
 	/** Properties in order of most-to-least interesting for client projects to override **/
 	
 	/**
-	 * @parameter default-value="${project.basedir}${file.separator}src${file.separator}main${file.separator}javascript" expression="${jsSrcDir}"
+	 * @parameter default-value="${project.basedir}${file.separator}src${file.separator}main${file.separator}javascript" expression="${sourceDirectory}"
 	 */
-	protected File jsSrcDir;
-	
+	protected File sourceDirectory;
+
+    /**
+     * Base directory for jsunit test.
+     *
+     * @parameter default-value="${project.basedir}${file.separator}src${file.separator}test${file.separator}javascript" expression="${jsunitTestSourceDirectory}"
+     */
+    protected File jsunitTestSourceDirectory;
+
 	/**
-	 * @parameter default-value="${project.basedir}${file.separator}src${file.separator}test${file.separator}javascript" expression="${jsTestSrcDir}"
+	 * @parameter default-value="${project.basedir}${file.separator}src${file.separator}test${file.separator}javascript" expression="${jsunitTestSourceDirectory}"
 	 */
-	protected File jsTestSrcDir;
-	
+	protected File jasmineTestSourceDirectory;
+
 	/**
 	 * @parameter default-value="js" expression="${packageJavaScriptPath}"
 	 */
@@ -28,8 +54,8 @@ public abstract class AbstractJasmineMojo extends AbstractMojo {
 	
 	/**
 	 * JavaScript sources (typically vendor/lib dependencies) that need to be loaded
-	 * before other sources (and specs) in a particular order, these are relative to the ${jsSrcDir} 
-	 * directory! Therefore, if jquery.js is in `${jsSrcDir}/vendor`, you would configure:
+	 * before other sources (and specs) in a particular order, these are relative to the ${sourceDirectory}
+	 * directory! Therefore, if jquery.js is in `${sourceDirectory}/vendor`, you would configure:
 	 * 
 	 *  	&lt;preloadSources&gt;
 	 *			&lt;source&gt;vendor/z.js&lt;/source&gt;
@@ -45,18 +71,36 @@ public abstract class AbstractJasmineMojo extends AbstractMojo {
 	 * @parameter default-value="${project.build.directory}${file.separator}jasmine"
 	 */
 	protected File jasmineTargetDir;
+
+    /**
+     * The folder for javascripts dependencies
+     *
+     * @parameter expression="${scripts}" default-value="lib"
+     */
+    protected String libsDirectory;
+
+    /**
+     * Use the artifactId as folder
+     *
+     * @parameter
+     */
+    protected boolean useArtifactId;    
 	
-	
-	/**
-	 * @parameter expression="${skipTests}"
-	 */
-	protected boolean skipTests;
-	
-	/**
-	 * @parameter default-value="true" expression="${haltOnFailure}"
-	 */
-	protected boolean haltOnFailure;
-	
+    /**
+     * Set this to 'true' to bypass unit tests entirely. Its use is NOT
+     * RECOMMENDED, but quite convenient on occasion.
+     *
+     * @parameter expression="${maven.test.skip}"
+     */
+    protected boolean skipTests;
+
+    /**
+     * Set this to true to ignore a failure during testing. Its use is NOT
+     * RECOMMENDED, but quite convenient on occasion.
+     *
+     * @parameter expression="${maven.test.failure.ignore}"
+     */
+    protected boolean testFailureIgnore;
 	
 	/**
 	 * @parameter default-value="${project.build.directory}${file.separator}${project.build.finalName}"

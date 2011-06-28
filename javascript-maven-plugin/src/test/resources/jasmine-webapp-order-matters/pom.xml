@@ -21,21 +21,11 @@
 				<groupId>searls</groupId>
 				<artifactId>jasmine-maven-plugin</artifactId>
 				<version>${project.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>resources</goal>
-							<goal>testResources</goal>
-							<goal>test</goal>
-							<goal>preparePackage</goal>
-						</goals>
-						<configuration>
-							<preloadSources>
-								<source>z.js</source>
-							</preloadSources>
-						</configuration>
-					</execution>
-				</executions>
+        <configuration>
+          <preloadSources>
+            <source>z.js</source>
+          </preloadSources>
+        </configuration>
 			</plugin>
 		</plugins>
 	</build>

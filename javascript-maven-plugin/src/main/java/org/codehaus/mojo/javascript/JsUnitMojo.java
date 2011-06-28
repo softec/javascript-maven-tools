@@ -24,11 +24,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 
-import junit.framework.TestSuite;
-import net.jsunit.Configuration;
-import net.jsunit.ConfigurationException;
-import net.jsunit.JsUnitServer;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.surefire.junit.JUnitTestSet;
@@ -40,6 +35,11 @@ import org.apache.maven.surefire.testset.AbstractTestSet;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.IOUtil;
 import org.mortbay.util.MultiException;
+
+import junit.framework.TestSuite;
+import net.jsunit.Configuration;
+import net.jsunit.ConfigurationException;
+import net.jsunit.JsUnitServer;
 
 /**
  * Goal which runs javascript tests using jsunit framework. Tests can be writter
@@ -55,10 +55,10 @@ public class JsUnitMojo
     /**
      * Set this to 'true' to bypass unit tests entirely. Its use is NOT
      * RECOMMENDED, but quite convenient on occasion.
-     * 
+     *
      * @parameter expression="${maven.test.skip}"
      */
-    private boolean skip;
+    private boolean skipTests;
 
     /**
      * Set this to true to ignore a failure during testing. Its use is NOT
@@ -71,23 +71,28 @@ public class JsUnitMojo
     /**
      * Base directory where all reports are written to.
      * 
-     * @parameter expression="${project.build.directory}/surefire-reports"
+     * @parameter expression="${project.build.directory}${file.separator}surefire-reports"
      */
     private File reportsDirectory;
 
     /**
      * Base directory where jsunit will run.
      * 
-     * @parameter expression="${project.build.directory}/test-scripts"
+     * @parameter expression="${project.build.directory}${file.separator}test-scripts"
      */
     private File workDirectory;
 
     /**
      * Base directory for jsunit test.
      * 
-     * @parameter expression="${basedir}/src/test/javascript"
+     * @parameter default-value="${project.basedir}${file.separator}src${file.separator}test${file.separator}javascript" expression="${testSourceDirectory}"
      */
-    private File testSourceDirectory;
+    private File jsunitTestSourceDirectory;
+
+    /**
+     * @parameter default-value="${project.basedir}${file.separator}src${file.separator}test${file.separator}javascript" expression="${testSourceDirectory}"
+     */
+    private File jasmineTestSourceDirectory;
 
     /**
      * Browsers to run the jsunit tests
@@ -140,9 +145,14 @@ public class JsUnitMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
-        if ( skip )
+        if(jsunitTestSourceDirectory.equals(jasmineTestSourceDirectory) || !jsunitTestSourceDirectory.exists()) {
+            getLog().info("No JsUnit tests, skipping JsUnit tests execution.");
+            return;
+        }
+
+        if (skipTests)
         {
-            getLog().warn( "tests are skipped." );
+            getLog().warn( "Skipping JsUnit tests." );
             return;
         }
 
@@ -276,12 +286,12 @@ public class JsUnitMojo
 
     private String[] getTestsToRun()
     {
-		if ( !testSourceDirectory.exists() )
+		if ( !jsunitTestSourceDirectory.exists() )
 		{
 			return null;
 		}
         DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir( testSourceDirectory );
+        scanner.setBasedir(jsunitTestSourceDirectory);
         scanner.setExcludes( excludes );
         scanner.addDefaultExcludes();
         if ( includes == null )

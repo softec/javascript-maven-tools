@@ -32,12 +32,12 @@ import org.codehaus.plexus.util.FileUtils;
 /**
  * Goal which copies scripts to the test-script directory.
  * 
- * @goal prepare-tests
+ * @goal prepare-jsunit-tests
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="mailto:nicolas@apache.org">Nicolas De Loof</a>
  */
-public class PrepareTestsMojo
+public class PrepareJsunitTestsMojo
     extends AbstractMojo
 {
 
@@ -56,7 +56,7 @@ public class PrepareTestsMojo
      * 
      * @parameter expression="${maven.test.skip}"
      */
-    private boolean skip;
+    private boolean skipTests;
 
     /**
      * Location of the source files.
@@ -70,14 +70,19 @@ public class PrepareTestsMojo
      * 
      * @parameter default-value="${basedir}/src/test/javascript"
      */
-    protected File testSourceDirectory;
+    protected File jsunitTestSourceDirectory;
+
+    /**
+     * @parameter default-value="${project.basedir}${file.separator}src${file.separator}test${file.separator}javascript" expression="${testSourceDirectory}"
+     */
+    protected File jasmineTestSourceDirectory;
 
     /**
      * Location of the source files.
      * 
      * @parameter default-value="${project.build.directory}/test-scripts"
      */
-    protected File outputDirectory;
+    protected File workDirectory;
 
     /**
      * The folder for javascripts dependencies
@@ -106,8 +111,12 @@ public class PrepareTestsMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
-        if ( skip || !testSourceDirectory.exists() )
-        {
+        if(skipTests) {
+            return;
+        }
+
+        if(jsunitTestSourceDirectory.equals(jasmineTestSourceDirectory) || !jsunitTestSourceDirectory.exists()) {
+            getLog().info("No JsUnit tests, skipping JsUnit tests preparation.");
             return;
         }
 
@@ -120,30 +129,30 @@ public class PrepareTestsMojo
             String[] files = scanner.getIncludedFiles();
             for ( int i = 0; i < files.length; i++ )
             {
-                File destFile = new File( outputDirectory, files[i] );
+                File destFile = new File(workDirectory, files[i] );
                 destFile.getParentFile().mkdirs();
                 FileUtils.copyFile( new File( sourceDirectory, files[i] ), destFile );
             }
 
-            scanner.setBasedir( testSourceDirectory );
+            scanner.setBasedir(jsunitTestSourceDirectory);
             scanner.scan();
             files = scanner.getIncludedFiles();
             for ( int i = 0; i < files.length; i++ )
             {
-                File destFile = new File( outputDirectory, files[i] );
+                File destFile = new File(workDirectory, files[i] );
                 destFile.getParentFile().mkdirs();
-                FileUtils.copyFile( new File( testSourceDirectory, files[i] ), destFile );
+                FileUtils.copyFile( new File(jsunitTestSourceDirectory, files[i] ), destFile );
             }
         }
         catch ( IOException e )
         {
-            throw new MojoExecutionException( "Failed to copy scripts in " + outputDirectory );
+            throw new MojoExecutionException( "Failed to copy scripts in " + workDirectory);
         }
 
         try
         {
             javascriptArtifactManager.unpack( project, DefaultArtifact.SCOPE_TEST, new File(
-                outputDirectory, libsDirectory ), useArtifactId );
+                workDirectory, libsDirectory ), useArtifactId );
         }
         catch ( ArchiverException e )
         {
