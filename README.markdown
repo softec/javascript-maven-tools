@@ -15,7 +15,7 @@ which seems to be abandoned since a while, and has never reach a release version
 We introduce some major improvements, and in particular support for
 Jasmine test, based on [jasmine-maven-plugin](https://github.com/searls/jasmine-maven-plugin).
 
-### Targeted platforms ###dd
+### Targeted platforms ###
 
 Javascript-Maven-Tools is build and tested on Maven2 and should work on any
 Maven2 compatible platform.
