@@ -93,6 +93,9 @@ public abstract class AbstractPackageMojo
             {
                 archiver.createDefaultManifest( project );
             }
+            if (getScriptsDirectory() != null && !getScriptsDirectory().exists()) {
+                getScriptsDirectory().mkdirs();
+            }
             archiver.addDirectory( getScriptsDirectory() );
             String groupId = project.getGroupId();
             String artifactId = project.getArtifactId();

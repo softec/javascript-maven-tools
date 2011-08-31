@@ -1,0 +1,63 @@
+  The JavaScript Maven Tools improved by SOFTEC sa, aims to provide Javascript developpers
+  with equivalent tools to those found for Java in Maven. It brings to Javascript the whole
+  benefits of Maven dependency and build management and to Maven the specific tools
+  required for Javascript development.
+
+  Throught the use of new packaging types and lifecycles, it allow building standalone pure
+  JavaScript librairies, part of JEE web applications, and Appcelerator\u2122 Titanium
+  applications for Android and iOS. It promote best development practices with standardized
+  project organization, so that developers can be quickly productive on existing projects
+  and take advantage of modular developement similar to the scheme followed in Java.
+
+  Until now, there is no real consensus on how to manage a JavaScript project. We really
+  hope to provide tools that will help existing users of Maven to find a new way to
+  manage their JavaScript projet, either integrated in a larger Java web application or as
+  standalone well modularized libraries.
+
+Overview
+
+  JavaScript Maven Tools is architectured around two plugins and two extensions:
+
+  * {{{./javascript-maven-plugin/index.html}JavaScript Maven Plugin}} is a multi-purpose
+    build manager for Javascript projects. It brings two new packaging types
+    <<<javascript>>> and <<<titanium>>> to build standalone JavaScript libraries and
+    Titanium Appcelerator\u2122 applications. It also integrate in <<<war>>> projects
+    for integration in web applications. It allows unit and functional testing using
+    the traditional {{{http://www.jsunit.net}JsUnit}} framework or the more adapted
+    {{{http://pivotal.github.com/jasmine/}Jasmine}} behavior-driven testing framework.
+
+  * {{{./javascript-report-maven-plugin/plugin-info.html}JavaScript Report Maven Plugin}}
+    is a reporting plugin for JavaScript documentation and quality assurance. It brings
+    the power of JSDoc and JSLint to maven.
+
+  * {{{./javascript-compressor/project-summary.html}JavaScript Compressors}} provide to the above
+    plugin a common interface to existing JavaScript minifiers, and allowing upcomming
+    one to be easily integrated. It currently support Douglas Crockford's JSMin,
+    Dojo Shrinksafe and YahooUI compression engines.
+
+  * {{{./javascript-maven-archive/project-summary.html}JavaScript Maven Archive}} bring
+    a new archive format to support JavaScript archives in Maven repositories. It allows
+    Maven dependency management to be used for JavaScript dependencies in the same way
+    it is used for Java.
+
+Getting started
+
+  To be upto speed in no time, based on your existing Maven knowledge, your need to read
+  the {{{./javascript-maven-plugin/index.html}JavaScript Maven Plugin}} page.
+
+Credits to forked and related projects
+
+  This project is a fork of the original project hosted at
+  {{{http://mojo.codehaus.org/javascript-maven-tools/}codehaus}} which seems to be
+  abandoned since a while, and has never reach a release version. We introduce some major
+  improvements, and in particular support for Jasmine test, based on the
+  {{{https://github.com/searls/jasmine-maven-plugin}Jasmine Maven Plugin}}, and support
+  of {{{http://www.appcelerator.com/}Appcelerator\u2122 Titanium}} command line builders.
+
+License
+
+  Javascript-Maven-Tools improved by {{{http://softec.lu}SOFTEC sa}} is license under
+  the {{{http://www.apache.org/licenses/LICENSE-2.0}Apache License, Version 2.0}}.
+  If you need another license, please {{{mailto:support@softec.lu}contact us}}
+  with an description of your expected usage, and we will propose you an
+  appropriate agreement on a case by case basis.

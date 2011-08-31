@@ -30,16 +30,15 @@
   <parent>
     <groupId>org.codehaus.mojo.javascript</groupId>
     <artifactId>javascript-compressor</artifactId>
-    <version>1.0-softec</version>
+    <version>1.1-softec</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>yahooui-compressor</artifactId>
   <packaging>jar</packaging>
   <name>Yahoo UI compressor support</name>
-  <url>
-    http://mojo.codehaus.org/javascript-maven-tools/javascript-compressor/yahooUI-compressor/
-  </url>
+  <description>Yahoo UI compressors for Maven</description>
+  <url>http://javascript-maven.softec.lu/javascript-compressor/yahooui-compressor/</url>
 
   <build>
     <defaultGoal>install</defaultGoal>

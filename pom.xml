@@ -32,8 +32,8 @@
   <artifactId>javascript-maven-tools</artifactId>
   <packaging>pom</packaging>
   <name>Maven tools for JavaScript developers</name>
-  <version>1.0-softec</version>
-  <url>http://mojo.codehaus.org/javascript-maven-tools</url>
+  <version>1.1-softec</version>
+  <url>http://javascript-maven.softec.lu/</url>
 
   <description>
       A set of tools to bring maven support to JavaScript developpers.
@@ -61,6 +61,29 @@
       <timezone>+1</timezone>
       <url>http://blof.loof.fr</url>
     </developer>
+   <developer>
+      <id>DenisG</id>
+      <name>Denis Gervalle</name>
+      <email>Denis.Gervalle@softec.lu</email>
+      <organization>SOFTEC sa</organization>
+      <organizationUrl>http://softec.lu/</organizationUrl>
+      <roles>
+        <role>CEO</role>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>OlivierD</id>
+      <name>Olivier Desaive</name>
+      <email>Olivier.Desaive@softec.lu</email>
+      <organization>SOFTEC sa</organization>
+      <organizationUrl>http://softec.lu/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
   <contributors>
     <contributor>
@@ -68,12 +91,17 @@
       <url>http://blog.devspan.com</url>
     </contributor>
   </contributors>
-    
   <scm>
-    <connection>scm:svn:http://svn.softec.lu/java/trunk/javascript-maven-tools</connection>
-    <developerConnection>scm:svn:svn+ssh://svn@svn.softec.lu/java/trunk/javascript-maven-tools</developerConnection>
-    <url>http://svn.softec.lu/java/trunk/javascript-maven-tools</url>
-  </scm>    
+    <connection>scm:git:ssh://git@github.com:softec/javascript-maven-tools.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:softec/javascript-maven-tools.git</developerConnection>
+    <url>https://github.com/softec/javascript-maven-tools</url>
+  </scm>
+
+  <issueManagement>
+    <system>github</system>
+    <url>http://github.com/softec/javascript-maven-tools/issues</url>
+  </issueManagement>
+
   <repositories>
     <repository>
       <id>codehaus.org</id>
@@ -86,6 +114,7 @@
       <url>http://snapshots.repository.codehaus.org</url>
     </repository>
   </repositories>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -110,21 +139,139 @@
        </dependency>      
     </dependencies>
   </dependencyManagement>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <build>
+    <extensions>
+        <extension>
+            <groupId>org.apache.maven.scm</groupId>
+            <artifactId>maven-scm-provider-gitexe</artifactId>
+            <version>1.4</version>
+        </extension>
+        <extension>
+            <groupId>org.apache.maven.scm</groupId>
+            <artifactId>maven-scm-manager-plexus</artifactId>
+            <version>1.4</version>
+        </extension>
+        <extension>
+            <groupId>org.kathrynhuxtable.maven.wagon</groupId>
+            <artifactId>wagon-gitsite</artifactId>
+            <version>0.3.1</version>
+        </extension>
+    </extensions>
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.0.2</version>
+          <version>2.3.2</version>
           <configuration>
             <source>1.5</source>
             <target>1.5</target>
           </configuration>
         </plugin>
+        <plugin>
+            <artifactId>maven-site-plugin</artifactId>
+            <version>2.1.1</version>
+            <configuration>
+              <outputEncoding>${project.build.sourceEncoding}</outputEncoding>
+            </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
+
+  <profiles>
+    <profile>
+      <id>maven-3</id>
+      <activation>
+        <file>
+          <!--  This employs that the basedir expression is only recognized by Maven 3.x (see MNG-2363) -->
+          <exists>${basedir}</exists>
+        </file>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-site-plugin</artifactId>
+              <version>3.0</version>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+        <plugins>
+          <plugin>
+            <artifactId>maven-site-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-descriptor</id>
+                <goals>
+                  <goal>attach-descriptor</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.4</version>
+          <reportSets>
+            <reportSet>
+              <reports>
+                <report>index</report>
+                <report>dependencies</report>
+                <report>license</report>
+                <report>plugins</report>
+                <report>summary</report>
+                <report>project-team</report>
+                <report>scm</report>
+                <report>issue-tracking</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <javaApiLinks>
+            <name>api_1.5</name>
+            <value>http://download.oracle.com/javase/1,5.0/docs/api/</value>
+          </javaApiLinks>
+          <tagletArtifacts>
+            <tagletArtifact>
+              <groupId>org.apache.maven.plugin-tools</groupId>
+              <artifactId>maven-plugin-tools-javadoc</artifactId>
+              <version>2.5</version>
+            </tagletArtifact>
+            <tagletArtifact>
+              <groupId>org.codehaus.plexus</groupId>
+              <artifactId>plexus-javadoc</artifactId>
+              <version>1.0</version>
+            </tagletArtifact>
+          </tagletArtifacts>
+        </configuration>
+      </plugin>
+      <plugin>
+          <artifactId>maven-jxr-plugin</artifactId>
+          <version>2.2</version>
+      </plugin>
+      <plugin>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>2.9</version>
+      </plugin>
+    </plugins>
+  </reporting>
 
   <distributionManagement>
     <repository>
@@ -132,6 +279,10 @@
       <name>Open Source Release Distribution Repository</name>
       <url>http://nexus.softec.lu:8081/content/repositories/opensource</url>
     </repository>
+    <site>
+        <id>github</id>
+        <url>gitsite:git@github.com/softec/javascript-maven-tools.git</url>
+    </site>
   </distributionManagement>
   
 </project>

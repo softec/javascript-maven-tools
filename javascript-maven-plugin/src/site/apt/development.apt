@@ -1,48 +1,99 @@
-                                    ------
-                        Javascript development with maven
-                                    ------
-                                Nicolas De Loof
-                                    ------
-                                 Oct 02, 2007
+Javascript development with Maven
 
-Javascript development with maven
+* Why use Maven for JavaScript ?
 
-* Why use maven for Javascript ?
-
-  Javascript is a ... script language. It does not require compilation neither
-  packaging to be released. This doesn't mean developping a javascript library
+  JavaScript is a ... script language. It does not require compilation neither
+  packaging to be released. This doesn't mean developping a JavaScript library
   does not require some tooling.
 
-  Javascript developers have created nice tools, like jsunit or jsdocs to
+  JavaScript developers have created nice tools, like jsunit or jsdocs to
   get a productive and controlled development environment. They also use
-  dedicated libraires like log4javascript for development purpose, split code
+  dedicated libraires like debug.js for development purpose, split code
   into fine grained scripts and use some assembly tools to create the released
-  scripts.
+  scripts like js-builder.
 
-  The Javascript maven plugin integrates those tools and provide a maven
+  The Javascript Maven Plugin integrates those tools and provide a Maven
   packaging with a dedicated lifecycle.
 
-* Assembly
 
-  Many javascript libraries are built based on a set of simple source scripts,
-  dedicated to a particular scope. In many case, using an object orientend
-  javascript style, every javascript class has it's own source file.
+** Folder structure
 
-  The javascript developper don't want to make web developers life complicate
-  and package there code into single scripts, or use-case related scripts, so
-  that only one <<<script>>> import in HTML pages is required to get the
-  library.
+ The Maven JavaScript Plugin use the following conventions for folder structure.
+ This is only a standard layout, not a requirement, but will keep your POM files
+ as simple as possible.
 
-  Assembling the source scripts can be handled by the javascript maven plugin,
-  either via it's native XML format, or using a
-  {{{http://code.google.com/p/js-builder}jsbuilder}} assembly file. To
-  avoid confusion with the
-  {{{http://maven.apache.org/plugins/maven-assembly-plugin}maven-assembly-plugin}},
-  such files are called "assembler descriptors".
++-----------------------------------------------------------------------------+
+  <project-root>/
+  |
+  +- pom.xml
+  |
+  +- src/
+  |  |
+  |  +- main/
+  |  |  |
+  |  |  +- javascript/ (source location for Scripts)
+  |  |  +- resources/ (source location for any static resources)
+  |  |
+  |  +- test/
+  |  |  |
+  |  |  +- javascript/ (source location for (jsunit) test sources)
+  |  |
+  ...
++-----------------------------------------------------------------------------+
+
+** Project Definition
+
+ Your project must configure some extentions to the maven base to enable the
+ JavaScript support:
+
++-----------------------------------------------------------------------------+
+<project>
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mycompany</groupId>
+  <artifactId>myexample</artifactId>
+  <packaging>javascript</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>My example Javascript project</name>
+
+  <build>
+    <outputDirectory>target/scripts</outputDirectory>
+    <testOutputDirectory>target/test-scripts</testOutputDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo.javascript</groupId>
+        <artifactId>javascript-maven-plugin</artifactId>
+        <extensions>true</extensions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
++-----------------------------------------------------------------------------+
+
+  Please note you have to setup Javascript Maven Plugin both:
+
+  - as a maven extension to get a JavaScript dedicated lifecycle
+
+  - as a plugin with <<<\<extensions\>true\</extensions\>>>> to handle javascript
+    dependencies
+
+  Once you have your pom setup then you can build the module in the normal way
+  via:
+
++-----------------------------------------------------------------------------+
+mvn install
++-----------------------------------------------------------------------------+
+
+** Project life cycle
+
+  Maven will take your source scripts and assemble them following an optional
+  descriptor. The descriptor can either be written via the plugin native XML
+  format, or using a {{{http://code.google.com/p/js-builder}jsbuilder}} file. All
+  non listed scripts will simply be copied to the packaging directory.
 
   A typical assembler looks like this :
 
---------------------------
++-----------------------------------------------------------------------------+
 <?xml version="1.0"?>
 <assembler>
   <scripts>
@@ -59,38 +110,141 @@ Javascript development with maven
     </script>
   </scripts>
 </assembler>
---------------------------
++-----------------------------------------------------------------------------+
 
-* Strip debuging code
+  The <<<src/assembler>>> folder will contain this assembler descriptor. By default, the
+  <<<compile>>> goal will search for an assembler descriptor whose name match
+  the one of the artifact id.
 
-  Coding javascript is difficult due to the lack of compiler to check the code,
-  and fiew debuggers availables. Many developers use debuging code, for example
-  based on the {{{http://www.timdown.co.uk/log4javascript}log4javascript}}
-  library.
+  You can take advantage of other javascript librairies to make your code
+  simplier or cleaner. Simply declare a dependency of type <<<javascript>>> and
+  Maven will download the associated javascript archive.
+
++-----------------------------------------------------------------------------+
+  <dependencies>
+    <dependency>
+      <groupId>org.prototypejs</groupId>
+      <artifactId>prototype</artifactId>
+      <version>1.5.1.1</version>
+      <type>javascript</type>
+    </dependency>
+  </dependencies>
++-----------------------------------------------------------------------------+
+
+  You can unit test your scripts by including {{{http://www.jsunit.net}jsUnit}}
+  tests. Tests, source scripts and dependencies will be copied in a working
+  directory before running the test suite.
+
+** Strip debuging code
+
+  Coding JavaScript is difficult due to the lack of compiler to check the code,
+  and few debuggers availables. Many developers use debuging code, for example
+  based on the {{{https://github.com/softec/debug}debug.js}} library.
 
   In some case a production-mode is considered and disables debugs. For example,
-  the log4javascript library comes with a stub version that does nothing. The
-  javascript-maven-plugin offers an alternative solution with the strip-debugs
-  goal. This goal removes all lines from the packaged scripts that start with a
-  special token, by default ";;;". This will remove from the following sample
-  all references to log4javascript :
+  the log4JavaScript library comes with a stub version that does nothing. The
+  JavaScript Maven Plugin offers an alternative solution with the <<<compress>>>
+  goal. This goal, appart for providing JS compression to your code, could also
+  removes all lines from the packaged scripts that start with one or more
+  special tokens.
+  To remove debug.js, type and argument checking code from the following sample :
 
---------------------------
-;;; var logger = log4javascript.getDefaultLogger();
-
++-----------------------------------------------------------------------------+
     var format = function( n, format )
     {
-;;;     logger.debug( "format " + n + " as " + format );
-        if( isNaN(n) ) return "-";
-        ....
---------------------------
+      Improved.checkType(Object.isNumber,n,this);
+      Improved.checkType(Object.isString,format,this);
+      debug.debug( "format " + n + " as " + format );
+      /*debug*/ if( isNaN(n) ) return "-";
+      ....
++-----------------------------------------------------------------------------+
 
-* Compress the scripts
+  you simply configure the <<<compress>>> goal using:
 
-  The compress goal is used to compress web application scripts before packaging
-  a web application. The compressor used is configurable, with support for
-  {{{http://www.crockford.com/javascript/jsmin.html}JsMin}},
-  and {{{http://dojotoolkit.org/docs/shrinksafe}Dojo Shrinksafe}}.
++-----------------------------------------------------------------------------+
+ <plugin>
+    <groupId>org.codehaus.mojo.javascript</groupId>
+    <artifactId>javascript-maven-plugin</artifactId>
+    <configuration>
+      ...
+      <strips>
+          <strip>debug.</strip>
+          <strip>Improved.check</strip>
+          <strip>/*debug*/</strip>
+      </strips>
+      ...
+    </configuration>
+...
++-----------------------------------------------------------------------------+
 
-  The compress-attached goal is for pure javascript developers purpose. It
-  creates a second artifact for the javascript library with compressed scripts.
+** Compress the scripts
+
+  The compress goal is also usefull to compress scripts for production,
+  minimizing load time and bandwidth consumption for the end-user.
+
+  The compressor used is configurable and currently support
+  {{{http://www.crockford.com/JavaScript/jsmin.html}JsMin}},
+  {{{http://dojotoolkit.org/docs/shrinksafe}Dojo Shrinksafe}} and
+  {{{http://developer.yahoo.com/yui/compressor/}YUI Compressor}}.
+
+  The compress-attached goal is for pure JavaScript developers purpose. It
+  creates a second artifact for the JavaScript library with compressed scripts.
+
+  Here is a profile to attach a compressed release version of a JavaScript library,
+  without debugging code and compressed using YUI compressor at level 5 :
+
++-----------------------------------------------------------------------------+
+      <profiles>
+        <profile>
+          <id>release</id>
+          <build>
+            <plugins>
+              <plugin>
+                <groupId>org.codehaus.mojo.javascript</groupId>
+                <artifactId>javascript-maven-plugin</artifactId>
+                <configuration>
+                  <compressor>yahooUI</compressor>
+                  <optimizationLevel>5</optimizationLevel>
+                  <strips>
+                      <strip>debug.</strip>
+                      <strip>Improved.check</strip>
+                      <strip>/*debug*/</strip>
+                  </strips>
+                </configuration>
+                <executions>
+                  <execution>
+                    <id>compress</id>
+                    <phase>compile</phase>
+                    <goals>
+                      <goal>compress</goal>
+                    </goals>
+                  </execution>
+                  <execution>
+                    <id>package-compressed</id>
+                    <phase>package</phase>
+                    <goals>
+                      <goal>attach-compressed</goal>
+                    </goals>
+                  </execution>
+                </executions>
+              </plugin>
+            </plugins>
+          </build>
+        </profile>
+      </profiles>
++-----------------------------------------------------------------------------+
+
+** Deployment
+
+  Finally, Maven will package your scripts as a JavaScript archive to get deployed
+  in your Maven repository. Optionally, you can create a compressed version of
+  your scripts, to distribute a lightweight version of your project to non-maven
+  users.
+
+** Project documentation
+
+ You can document your code by following the {{{http://www.jsdoctoolkit.org}jsDoc}}
+ conventions, very similar to javadoc.
+
+ Maven can also run {{{http://www.jslint.com}jslint}} on your project to check
+ code quality.

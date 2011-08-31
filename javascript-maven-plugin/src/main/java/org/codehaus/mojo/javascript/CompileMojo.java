@@ -59,7 +59,7 @@ public class CompileMojo
     extends AbstractMojo
 {
     /** default includes pattern */
-    private static final String[] DEFAULT_INCLUDES = { "**/*.js" };
+    protected static final String[] DEFAULT_INCLUDES = { "**/*.js" };
 
     /**
      * The maven project.
@@ -68,7 +68,7 @@ public class CompileMojo
      * @required
      * @readonly
      */
-    private MavenProject project;
+    protected MavenProject project;
 
     /**
      * Location of the source files.
@@ -96,26 +96,26 @@ public class CompileMojo
      *
      * @parameter
      */
-    private boolean useArtifactId;
+    protected boolean useArtifactId;
 
     /**
      * Exclusion pattern.
      *
      * @parameter
      */
-    private String[] excludes;
+    protected String[] excludes;
 
     /**
      * Inclusion pattern.
      *
      * @parameter
      */
-    private String[] includes;
+    protected String[] includes;
 
     /**
      * @component
      */
-    private AssemblerReaderManager assemblerReaderManager;
+    protected AssemblerReaderManager assemblerReaderManager;
 
     /**
      * Descriptor for the strategy to assemble individual scripts sources into
@@ -123,27 +123,33 @@ public class CompileMojo
      *
      * @parameter default-value="${basedir}/src/assembler/${project.artifactId}.xml"
      */
-    private File descriptor;
+    protected File descriptor;
 
     /**
      * Descriptor file format (default or jsbuilder)
      *
      * @parameter
      */
-    private String descriptorFormat;
+    protected String descriptorFormat;
 
     /**
      * @component
      */
-    private JavascriptArtifactManager javascriptArtifactManager;
+    protected JavascriptArtifactManager javascriptArtifactManager;
 
     // Compile-time dependency count
-    private int depsCount = 0;
+    protected int depsCount = 0;
 
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
-        outputDirectory.mkdirs();
+        if (outputDirectory == null) {
+            getLog().error("OutputDirectory is null");
+            throw new MojoExecutionException("outputDirectory must be specified");
+        } else {
+            getLog().debug("Creating outputDirectory " + outputDirectory);
+            outputDirectory.mkdirs();
+        }
 
         try
         {
@@ -157,6 +163,10 @@ public class CompileMojo
 
         Set merged = assemble();
 
+        copyUnmerged(merged);
+    }
+
+    protected void copyUnmerged(Set merged) throws MojoExecutionException{
         if ( includes == null )
         {
             includes = DEFAULT_INCLUDES;
@@ -244,7 +254,7 @@ public class CompileMojo
         return assemble( assembler );
     }
 
-    private Set assemble( Assembler assembler )
+    protected Set assemble( Assembler assembler )
         throws MojoExecutionException
     {
         Set merged = new HashSet();
@@ -307,7 +317,7 @@ public class CompileMojo
         return merged;
     }
 
-    private int appendScriptFile(File dir, DirectoryScanner scanner, PrintWriter writer, String scriptInclude, Set merged)
+    protected int appendScriptFile(File dir, DirectoryScanner scanner, PrintWriter writer, String scriptInclude, Set merged)
         throws IOException
     {
         scanner.setIncludes( new String[] { scriptInclude } );

@@ -1,51 +1,221 @@
- ------
- Introduction
- ------
- Nicolas De Loof
- ------
- 02 Oct 2007
- ------
+Maven JavaScript Plugin
 
+  Maven JavaScript Plugin is a multi-purpose build manager for Javascript projects.
+  It brings two new packaging types <<<javascript>>> and <<<titanium>>> with their
+  own lifecycle to build standalone JavaScript libraries and Appcelerator\u2122
+  Titanium applications. It also integrate in <<<war>>> projects for integration in
+  web applications. Finally, it allows unit and functional testing using the
+  traditional {{{http://www.jsunit.net}JsUnit}} framework or the more adapted
+  {{{http://pivotal.github.com/jasmine/}Jasmine}} behavior-driven testing framework.
+   
+Goals Overview
 
-Maven Javascript Plugin
+* For JavaScripts developers :
 
-  Maven javascript plugin aims to provide a project lifecycle similar to the
-  one used by java projects, and to integrate with java war projects.
+  * {{{./compile-mojo.html}javascript:compile}} prepares your scripts to get packed.
+    An XML descriptor can be used to configure some scripts to get merged into a
+    single new file. Resolve compile-time dependencies and provide them to the
+    assembling processor as well.
 
-* Goals Overview
+  * {{{./compress-mojo.html}javascript:compress}} uses a configurable javascript
+    compressor to reduce the weight of JavaScript files resulting from
+    {{{./compile-mojo.html}javascript:compile}} goal. Optionnaly also strip out
+    debugging code from scripts before compression, by removing all lines that start
+    with given special tokens.
 
-  For web application developers :
+  * {{{./package-mojo.html}javascript:package}} packs scripts into a Maven Javascript
+    archive, ready to be installed and deployed in a Maven repository.
 
-  * {{{copy-dependencies-mojo.html}javascript:copy-dependencies}} handles
-  javascript dependencies and unpack them to your script directory.
+  * {{{./attach-compressed-mojo.html}javascript:attach-compressed}} packs compressed
+    scripts in a Maven JavaScript archive classified <<<compressed>>>, ready to be
+    installed and deployed in a Maven repository with the uncompressed version.
 
-  * {{{compile-mojo.html}javascript:compile}} prepares your scripts to get packaged
-  in the web application. An XML descriptor can be used to configure some scripts
-  to get merged into a new file.
+  * {{{./install-mojo.html}javascript:install}} installs the Maven JavaScript archive
+    in the local repository.
 
-  * {{{inplace-mojo.html}javascript:inplace}} unpack javascript dependencies to
-  your web application source, to enable quick development with servlet
-  containers that don't require a packaging phase.
+  * {{{./deploy-mojo.html}javascript:deploy}} deploys the Maven JavaScript archive
+    to a remote repository.
 
-  * {{{compress-mojo.html}javascript:compress}} use a configurable javascript
-  compressor to reduce the weight of js files. Optionnaly also strip all debugging
-  code from the scripts before packaging, by removing all lines that start with
-  a special token (";;;" for example).
+[]
 
-  For javascripts developers :
+* For web application developers :
 
-  * {{{package-mojo.html}javascript:package}} pack a maven based javascript
-  library as a javascript archive to get installed/deployed in the repository.
+  * {{{./inplace-mojo.html}javascript:inplace}} Unpacks run-time JavaScript dependencies
+    to your web application source folder, to enable quick development with servlet
+    containers that don't require a packaging phase.
 
-  * {{{attach-compressed-mojo.html}javascript:attach-compressed}} pack a javascript
-  archive with compressed version of the library scripts.
+  * {{{./war-package-mojo.html}javascript:war-package}} prepares scripts and runtime
+    dependencies to get packed in a web application.
 
+  * {{{./war-compress-mojo.html}javascript:war-compress}} uses a configurable JavaScript
+    compressor to reduce the weight of js files present in the webapp packaging folder.
+    Optionnaly also strip out debugging code from scripts before compression, by
+    removing all lines that start with a special token (";;;" for example).
 
-* Usage
+[]
 
-  Instructions on how to use the Maven Javascript Plugin can be found
-  {{{development.html}here}}.
+* For Titanium Appcelerator\u2122 application developers :
 
-  The plugin can handle javascript libraries as maven
-  {{{javascript-dependencies.html}dependencies}}
+  * {{{./titanium-compile-mojo.html}javascript:titanium-compile}} prepares your scripts
+    to get packed in a Titanium Appcelerator\u2122 application for a given platform.
+    An XML descriptor can be used to configure some scripts to get merged into a single
+    new file. An app.js file should result from this process. Resolve compile-time
+    dependencies and provide them to the assembling processor as well.
 
+  * {{{./titanium-prepare-package-mojo.html}javascript:titanium-prepare-package}} uses a
+    configurable JavaScript compressor to reduce the weight of js files present in the
+    application folder. Optionnaly also strip out debugging code from scripts before
+    compression, by removing all lines that start with a special token (";;;" for example).
+    <Only proceed to stripping and compression when preparing a production application.>
+
+  * {{{./titanium-package-mojo.html}javascript:titanium-package}} builds an native
+    application using Titanium Appcelerator\u2122 application builders for the requested
+    device. Optionally install the application on the device, or run it in an
+    emulator/simulator.
+
+[]
+
+* For unit and functional testing :
+
+  * {{{./prepare-jasmine-tests-mojo.html}javascript:prepare-jasmine-tests}} prepares
+    scripts for testing without assembling or compression. Resolves run-time
+    and provided dependencies. Prepares the Jasmine specs files.
+
+  * {{{./prepare-jsunit-tests-mojo.html}javascript:prepare-jsunit-tests}} prepares
+    scripts for testing using JSUnit framework.
+
+  * {{{./generateManualRunner-mojo.html}javascript:generateManualRunner}} resolves
+    run-time and provided dependencies. Generates a Jasmine runner for manual running
+    in an interactive browser, taking script sources directly in the project sources
+    tree, enabling quick development.
+
+  * {{{./jasmine-mojo.html}javascript:jasmine}} Generates a batch Jasmine specs runner
+    and run it under the HtmlUnit engine using one or more browser emulation modes.
+
+  * {{{./jsunit-mojo.html}javascript:jsunit}} Runs JSUnit tests.
+
+  * {{{./prepare-titanium-jasmine-tests-mojo.html}javascript:prepare-titanium-jasmine-tests}}
+    Prepares scripts for testing without assembling. Resolves run-time and provided
+    dependencies. Prepares the Jasmine specs files and generate an app.js scripts for
+    running tests in a Titanium Appcelerator\u2122 test application.
+
+  * {{{./titanium-jasmine-mojo.html}javascript:titanium-jasmine}} Builds an native
+    application using Titanium Appcelerator\u2122 application builders for the
+    requested device and install the application on the device, or runs it in an
+    emulator/simulator.
+
+[]
+
+Lifecycles
+
+  The Maven Javascript Plug-in provide two new packaging types <<<javascript>>> and
+  <<<titanium>>> which both associate custom goals to the standard lifecycle:
+
+* For <<<javascript>>> packaging :
+
+  * <<<process-ressource>>> phase executes the {{{http://maven.apache.org/plugins/maven-resources-plugin/resources-mojo.html}ressources:ressources}} goal to process project resources in a standard way.
+
+  * <<<compile>>> phase executes the {{{./compile-mojo.html}javascript:compile}} goal which prepares and assemble scripts and compile-time dependencies for packaging.
+
+  * <<<process-test-ressource>>> phase executes the {{{http://maven.apache.org/plugins/maven-resources-plugin/testResources-mojo.html}ressources:testRessources}} goal to process project test resources in a standard way.
+
+  * <<<test-compile>>> phase executes {{{./prepare-jasmine-tests-mojo.html}javascript:prepare-jasmine-tests}} and {{{./prepare-jsunit-tests-mojo.html}javascript:prepare-jsunit-tests}} goals to prepare scripts for running tests.
+
+  * <<<test>>> phase executes {{{./jasmine-mojo.html}javascript:jasmine}} and {{{./jsunit-mojo.html}javascript:jsunit}} goals to run unit tests.
+
+  * <<<package>>> phase executes {{{./package-mojo.html}javascript:package}} goal to pack scripts into a Maven JavaScript archive.
+
+  * <<<install>>> phase executes {{{./install-mojo.html}javascript:install}} goal to install the Maven JavasScript archive in the local repository.
+
+  * <<<deploy>>> phase executes {{{./install-mojo.html}javascript:deploy}} goal to deploys the Maven JavaScript archive to a remote repository.
+
+[]
+
+* For <<<titanium>>> packaging:
+
+  * <<<process-ressource>>> phase executes the {{{http://maven.apache.org/plugins/maven-resources-plugin/resources-mojo.html}ressources:ressources}} goal to process project resources in a standard way.
+
+  * <<<compile>>> phase executes the {{{./titanium-compile-mojo.html}javascript:titanium-compile}} goal which prepares and assemble scripts and compile-time dependencies for a Titanium Appcelerator\u2122 application on a given platform.
+
+  * <<<process-test-ressource>>> phase executes the {{{http://maven.apache.org/plugins/maven-resources-plugin/testResources-mojo.html}ressources:testRessources}} goal to process project test resources in a standard way.
+
+  * <<<test-compile>>> phase executes {{{./prepare-titanium-jasmine-tests-mojo.html}javascript:prepare-titanium-jasmine-tests}} goal to prepare scripts for building a Titanium Appcelerator\u2122 test application on a given platform.
+
+  * <<<test>>> phase executes {{{./titanium-jasmine-mojo.html}javascript:titanium-jasmine}} goal to build and install or run a Titanium Appcelerator\u2122 test application on a given platform.
+
+  * <<<package>>> phase executes {{{./titanium-prepare-package-mojo.html}javascript:titanium-prepare-package}} and  {{{./titanium-package-mojo.html}javascript:titanium-package}} goals to build, and eventually install or run the Titanium Appcelerator\u2122 application on a given platform.
+
+[]
+
+Usage
+
+  The easiest way to use this plug in is to use it with its own specials lifecycles.
+  To ensure that you will be using the these lifecyles, there is two steps:
+
+    * Define the plugin as an extension to expose the specials lifecycles to Maven
+
+    * Use either <<<javascript>>> or <<<titanium>>> as packaging to select the correct
+      lifecycle for your build
+
+[]
+
+  Here is the minimal settings for completing these two requirements in your POM :
+
++-------------------------------------------------------+
+<project ...>
+  ...
+  <packaging>javascript</packaging>  OR  <packaging>titanium</packaging>
+  ...
+  <build>
+    ...
+    <plugins>
+      ...
+      <plugin>
+        <groupId>org.codehaus.mojo.javascript</groupId>
+        <artifactId>javascript-maven-plugin</artifactId>
+        <version>1.1-softec</version>
+        <extensions>true</extensions>
+        <configuration>
+        ...
+        </configuration>
+      </plugin>
+      ...
+    </plugins>
+    ...
+  </build>
+  ...
+  <pluginRepositories>
+    <pluginRepository>
+      <id>softec-opensource</id>
+      <url>http://nexus.softec.lu:8081/content/repositories/opensource</url>
+    </pluginRepository>
+  </pluginRepositories>
+  ...
+</project>
++-------------------------------------------------------+
+
+  For detailled information on plugin configuration, you should read:
+
+  * {{{./development.html}JavaScript development}}
+
+  * {{{./webapp-development.html}Javascript development in Web application}}
+
+  * {{{./titanium-development.html}Titanium Appcelerator\u2122 application development}}
+
+  * {{{./titanium-tutorial.html}Titanium Appcelerator\u2122 application tutorial}}
+
+Examples
+
+  For those who learn by example, here is some library project using JavaScript Maven tools :
+
+  * {{{https://github.com/softec/debug}debug.js}} - An improved implementation of Ben Alman debug.js, a standalone library
+
+  * {{{https://github.com/softec/debug}i18n}} - A localization library, a simple library with some dependencies
+
+  * {{{https://github.com/softec/carto}Carto}} - A wrapper and enhancer for Google Maps, a dual library with a special assembly for a Titanium classified version
+
+  * {{{https://github.com/softec/cartoclic/tree/cartoclic-jsapi}CartoClic JSAPI}} - A JS API for CartoClic, a library compatible with Titanium, with Titanium tests
+
+  * {{{https://github.com/softec/improved}Improved}} - An improved version of Prototype.js, a dual library with a Titanium classified version, and Titanium tests
+
+  * {{{https://github.com/softec/cartoclic/tree/cartoclic-titanium}CartoClic Titanium Application}} - A Titanium application, with Android and iOS build

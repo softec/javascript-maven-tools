@@ -67,7 +67,7 @@ public class SpecRunnerHtmlGeneratorTest {
 		
 		String html = specRunnerHtmlGenerator.generate(deps, ReporterType.TrivialReporter);
 		
-		assertThat(html,containsString("<style type=\"text/css\">"+css+"</style>"));
+		assertThat(html,containsString("<style type=\"text/css\">\n"+css+"\n</style>"));
 	}
 	
 	private Artifact mockDependency(String groupId, String artifactId, String version, String type,String fileContents) throws Exception {

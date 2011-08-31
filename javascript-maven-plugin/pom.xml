@@ -30,7 +30,7 @@
   <parent>
     <groupId>org.codehaus.mojo.javascript</groupId>
     <artifactId>javascript-maven-tools</artifactId>
-    <version>1.0-softec</version>
+    <version>1.1-softec</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -38,7 +38,8 @@
   <artifactId>javascript-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Javascript Maven Plugin</name>
-  <url>http://mojo.codehaus.org/javascript-maven-tools/javascript-maven-plugin/</url>
+  <description>A multi-purpose build management maven plugin for JavaScript</description>
+  <url>http://javascript-maven.softec.lu/javascript-maven-plugin/</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -74,18 +75,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>2.5.1</version>
+        <version>2.9</version>
         <configuration>
-					<goalPrefix>javascript</goalPrefix>
-				</configuration>
-				<executions>
-					<execution>
-						<id>generated-helpmojo</id>
-						<goals>
-							<goal>helpmojo</goal>
-						</goals>
-					</execution>
-				</executions>
+		  <goalPrefix>javascript</goalPrefix>
+		</configuration>
+		<executions>
+		  <execution>
+            <id>generated-helpmojo</id>
+              <goals>
+                <goal>helpmojo</goal>
+              </goals>
+          </execution>
+        </executions>
       </plugin>      
     </plugins>
   </build>
@@ -136,6 +137,10 @@
               <pomIncludes>
                 <pomInclude>*/pom.xml</pomInclude>
               </pomIncludes>
+              <pomExcludes>
+                  <pomExclude>**/war-project/pom.xml</pomExclude>
+                  <pomExclude>**/pure-javascript-project/pom.xml</pomExclude>
+              </pomExcludes>
               <postBuildHookScript>verify</postBuildHookScript>
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
               <goals>
@@ -341,7 +346,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <repositories>
     <repository>
       <id>searls-maven-thirdparty</id>

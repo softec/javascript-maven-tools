@@ -1,54 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2006-2007 the original author or authors.
+   Derivative Work
+   Copyright 2011 SOFTEC sa. All rights reserved.
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+   Original Work
+   Copyright 2006-2007 the original author or authors.
+   Nicolas De Loof <nicolas.deloof@gmail.com>
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
 
         http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 -->
 
 <project name="${project.name}">
     <bannerLeft>
-        <name>Mojo</name>
-        <src>http://mojo.codehaus.org/images/mojo_logo.png</src>
-        <href>http://mojo.codehaus.org</href>
+        <name>${project.organization.name}</name>
+        <src>images/softec.png</src>
+        <href>http://javascript-maven.softec.lu</href>
     </bannerLeft>
-
-    <bannerRight>
-        <name>Codehaus</name>
-        <src>http://mojo.codehaus.org/images/codehaus-small.png</src>
-        <href>http://codehaus.org</href>
-    </bannerRight>
+    <googleAnalyticsAccountId>UA-9704299-4</googleAnalyticsAccountId>
 
     <publishDate format="dd MMM yyyy" position="left"/>
 
     <version position="left"/>
 
     <body>
+        <head>
+          <!-- Use main project CSS for submodules (%2e is a hack to avoid relativization) -->
+          <link rel="stylesheet" href="/css/site%2ecss" type="text/css"/>
+        </head>
         <links>
-            <item name="Mojo" href="http://mojo.codehaus.org"/>
-            <item name="Maven" href="http://maven.apache.org "/>
+            <item name="${project.organization.name}" href="${project.organization.url}"/>
         </links>
+        <breadcrumbs>
+          <item name="JavaScript Maven Tools" href="index.html"/>
+        </breadcrumbs>
 
-        ${parentProject}
-
-        <menu name="Overview">
-            <item name="Introduction" href="index.html"/>
-            <item name="Developing JavaScript with maven" href="guide-javascript-development.html"/>
-            <item name="Developing JavaScript inside webapps" href="guide-webapp-development.html"/>
+        <menu name="Overview" inherit="top">
+          <item name="Introduction" href="index.html"/>
+          <item name="JavaScript development" href="javascript-maven-plugin/development.html"/>
+          <item name="JavaScript in Webapps" href="javascript-maven-plugin/webapp-development.html"/>
+          <item name="Titanium development" href="javascript-maven-plugin/titanium-development.html"/>
+          <item name="Titanium tutorial" href="javascript-maven-plugin/titanium-tutorial.html"/>
         </menu>
 
-        ${modules}
+        <menu ref="parent" inherit="top"/>
 
-        ${reports}
+        <menu ref="modules" inherit="top"/>
+
+        <menu ref="reports" inherit="top"/>
     </body>
 </project>
 

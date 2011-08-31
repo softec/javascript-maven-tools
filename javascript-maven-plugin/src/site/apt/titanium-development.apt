@@ -1,0 +1,356 @@
+Titanium Javascript development with Maven
+
+* Pre-Requisites
+
+  In order to use this Maven plugin, you need to have properly installed Titanium Studio
+  and required dependencies (SDK, XCode, ...) has describe for your targeted platform on
+  the {{{http://developer.appcelerator.com/get_started}Titanium Appcelerator\u2122 site}}.
+
+* Project configuration
+
+  In order to work correctly the Titanium Appcelerator\u2122 project must use
+  a custom packaging type named <<<titanium>>>.
+  When using this packaging the lifecycle is adapted for building a Titanium Appcelerator\u2122
+  application.
+
++-----------------------------------------------------------------------------+
+<project>
+    ...
+    <packaging>titanium</packaging>
+</project>
++-----------------------------------------------------------------------------+
+
+* Project structure
+
+  A typical Titanium Appcelerator\u2122 project structure looks like this:
+
++-----------------------------------------------------------------------------+
+  |- src
+    `- main
+      |- javascript  (common javascript files)
+      | |- android   (android specific javascript files)
+      | `- iphone    (ios specific javascript files)
+      |- resources   (common resources)
+        |- Ressources  (Titanium ressources)
+        | |- android   (android specific resources)
+        | `- iphone    (ios specific resources)
+        `- tiapp.xml (template for the tiapp.xml descriptor file)
++-----------------------------------------------------------------------------+
+
+* Process-Resources phase
+
+  Every Titanium Appcelerator\u2122 project must have a file named "tiapp.xml".
+  In order to automate the process, you may use the maven-resources-plugin to filter
+  a template tiapp.xml file.
+
+  A typical resource filtering will be
+
++-----------------------------------------------------------------------------+
+<project>
+  ...
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/tiapp.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/tiapp.xml</exclude>
+                </excludes>
+            </resource>
+        </resources>
+    </build>
+  ...
+</project>
++-----------------------------------------------------------------------------+
+
+  This avoid processing of other binary resource required, like the logos and other
+  image ressources.
+
+  And a typical tiapp.xml file could look like:
+
++-----------------------------------------------------------------------------+
+<?xml version="1.0" encoding="UTF-8"?>
+<ti:app xmlns:ti="http://ti.appcelerator.org">
+  <id>${titanium.bundleSeedId}.${project.groupId}.${project.artifactId}</id>
+  <name>${project.name}</name>
+  <version>${project.version}</version>
+  <publisher>${project.organization.name}</publisher>
+  <url>${project.url}</url>
+  <description>${project.description}</description>
+  <copyright>Copyright ${project.inceptionYear} - ${project.organization.name}</copyright>
+  <icon>${titanium.icon}</icon>
+  <persistent-wifi>${titanium.persistent-wifi}</persistent-wifi>
+  <prerendered-icon>${titanium.prerendered-icon}</prerendered-icon>mvn
+  <statusbar-style>${titanium.statusbar-style}</statusbar-style>
+  <statusbar-hidden>${titanium.statusbar-hidden}</statusbar-hidden>
+  <fullscreen>${titanium.fullscreen}</fullscreen>
+  <navbar-hidden>${titanium.navbar-hidden}</navbar-hidden>
+  <analytics>${titanium.analytics}</analytics>
+  <guid>${titanium.guid}</guid>
+  <property name="ti.android.google.map.api.key.development">${titanium.google.map.api.key.development}</property>
+  <property name="ti.android.google.map.api.key.production">${titanium.google.map.api.key.production}</property>
+  <iphone>
+     ${titanium.iphone}
+   </iphone>
+  <android xmlns:android="http://schemas.android.com/apk/res/android">
+     ${titanium.android}
+  </android>
+  <modules>
+     ${titanium.modules}
+  </modules>
+</ti:app>
++-----------------------------------------------------------------------------+
+
+  With the following properties defined in your POM:
+
++-----------------------------------------------------------------------------+
+  <properties>
+    <titanium.bundleSeedId>XXXXXXXXXX</titanium.bundleSeedId>
+    <titanium.icon>appicon.png</titanium.icon>
+    <titanium.persistent-wifi>false</titanium.persistent-wifi>
+    <titanium.prerendered-icon>false</titanium.prerendered-icon>
+    <titanium.statusbar-style>default</titanium.statusbar-style>
+    <titanium.statusbar-hidden>false</titanium.statusbar-hidden>
+    <titanium.fullscreen>false</titanium.fullscreen>
+    <titanium.navbar-hidden>false</titanium.navbar-hidden>
+    <titanium.analytics>false</titanium.analytics>
+    <titanium.guid>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</titanium.guid>
+    <titanium.google.map.api.key.development>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</titanium.google.map.api.key.development>
+    <titanium.google.map.api.key.production>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</titanium.google.map.api.key.production>
+    <titanium.iphone>
+      <![CDATA[
+        <orientations device="iphone">
+          <orientation>Ti.UI.PORTRAIT</orientation>
+          <orientation>Ti.UI.UPSIDE_PORTRAIT</orientation>
+          <orientation>Ti.UI.LANDSCAPE_LEFT</orientation>
+          <orientation>Ti.UI.LANDSCAPE_RIGHT</orientation>
+        </orientations>
+      ]]>
+    </titanium.iphone>
+    <titanium.android>
+      <![CDATA[
+      ]]>
+    </titanium.android>
+    <titanium.modules>
+      <![CDATA[
+      ]]>
+    </titanium.modules>
+  </properties>
++-----------------------------------------------------------------------------+
+
+* Compile phase
+
+  During the compile phase (which execute the <<<titanium-compile>>> goal),
+  the following operations are executed:
+
+  * The javascript dependencies are extracted to the <<<depsDirectory>>> folder;
+
+  * The javascript files present in the <<<sourceDirectory>>> are copied
+    to the <<<outputDirectory>>>;
+
+  * Javascript files present in the plaform specific folder located under
+    the <<<sourceDirectory>>> are copied to <<<outputDirectory>>>,
+    overwriting any existing common file previously copied.
+
+  * All those files are finally assembled according to the Assembler definition.
+
+[]
+
+  The parameters of the compile phase are similar to those of the javascript compile goal.
+  An additional parameters specific to titanium goals is required:
+
+  [platform] The name of the platform to compile.
+  The value of this parameter is used to determine the platform specific folder to use
+  when copying javascript files.
+
+[]
+
+  At the end of this phase, if you used the default <<<target/titanium>>> output directory,
+  and you have compile twice, once for Android and once for iPhone, you'll have the
+  following build structure:
+
++-----------------------------------------------------------------------------+
+|- target
+  `- titanium
+    |- android
+    | |- tiapp.xml     (processed tiapp.xml merged with properties from your pom)
+    | `- Resources
+    |   |- android
+    |   | `- any android resources
+    |   |- iphone      (useless)
+    |   `- any common resources
+    |- android-scripts
+    | |- app.js        (customized for android)
+    | `- any other js for android not assembled into app.js
+    |- iphone
+    | |- tiapp.xml     (processed tiapp.xml merged with properties from your pom)
+    | `- Resources
+    |   |- android     (useless)
+    |   |- iphone
+    |   | `- any iphone resources
+    |   `- any common resources
+    `- iphone-scripts
+      |- app.js        (customized for iphone)
+      `- any other js for iphone not assembled into app.js
++-----------------------------------------------------------------------------+
+
+* Prepare package phase
+
+  During this phase, the <<<*-scripts>>> folders are copied to the <<<Ressources>>>
+  folder. If the <<<executeMode>>> is <<<none>>>, the copy could also strip out debug
+  code and compress it. See the <<<compress>>> goal of Javascript development for more
+  information.
+
+* The package phase
+
+  During the package phase the Titanium Appcelerator\u2122 builders (written in Python)
+  are executed to build an application from <<<scriptsDirectory>>> folder for the specified
+  platform.
+
+  In order to be able to perform the packaging, the plugin needs to find the proper
+  builder for the target platform on the local filesystem.
+  It use two techniques to found the correct builder:
+
+  * By looking at the SDK version and using the standard location for the current OS;
+
+  * By specifying the builders to use manually.
+
+  []
+
+  To use the first technique, put the following in the plugin configuration:
+
++-----------------------------------------------------------------------------+
+<titaniumVersion>1.7.2</titaniumVersion>
++-----------------------------------------------------------------------------+
+
+  To use the second manual technique, use the following:
+
++-----------------------------------------------------------------------------+
+<titaniumSettings>
+  <androidBuilder>path/to/android/builder.py</androidBuilder>
+  <iosBuilder>path/to/iphone/builder.py</iosBuilder>
+</titaniumSettings>
++-----------------------------------------------------------------------------+
+
+  When compiling for the Android platform, the Android SDK location is retrieved based
+  on an environment variable named ANDROID_HOME. You may also specify the location of
+  the Android SDK in the plugin configuration or by setting the <<<${androidSdk}>>>
+  property. You may also specify the Android API version, which default to the highest
+  available.
+
++-----------------------------------------------------------------------------+
+<androidSDK>/path/to/the/android/sdk</androidSDK>
+<androidAPI>11</androidAPI>
++-----------------------------------------------------------------------------+
+
+  When packaging, you can also specify the executeMode. This property allow to specify
+  whether the packaged version should be executed on a device or on an emulator.
+  By default, the packaging phase doesn't execute the builded application.
+
+  When packaging for Android, you also need to configure some <<<virtualDevice>>>
+  parameters. This property allows you to specify the AVD on which the project should be
+  launched.
+
++-----------------------------------------------------------------------------+
+<virtualDevice>
+    <androidAPI>7</androidAPI>   <!-- defaults to the androidAPI set for compiling -->
+    <skin>HVGA</skin>   <!-- The skin of the AVD. If not specified HVGA will be used -->
+    <wait>60000</wait>  <!-- Time to wait for the emulator to startup -->
+</virtualDevice>
++-----------------------------------------------------------------------------+
+
+  When packaging for release, the code need to be properly signed using your
+  personnal signing key. You may specify to store and the name for the key
+  used in <<<titaniumSettings>>>
+
++-----------------------------------------------------------------------------+
+<titaniumSettings>
+  <!-- The keystore containing the key to use when signing the application -->
+  <keystore>/path/to/the/keystore</keystore>
+  <password>keystorePassword</password>
+  <alias>keyname</alias>
+</titaniumSettings>
++-----------------------------------------------------------------------------+
+
+  When compiling for iOS, you also need to specify the <<<iosVersion>>> (default to
+  the latest) and a provisioning profile if you want to run on a physical device.
+
++-----------------------------------------------------------------------------+
+<iosVersion>4.3</iosVersion>
+<titaniumSettings>
+  <iosDevelopmentProvisioningProfile>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxxx</iosDevelopmentProvisioningProfile>
+  <iosDistributionProvisioningProfile>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxxx</iosDistributionProvisioningProfile>
+</titaniumSettings>
++-----------------------------------------------------------------------------+
+
+  For running in a simulator you may when to also specify the characteristics of the
+  simulator in the <<<virtualDevice>>> parameter.
+
++-----------------------------------------------------------------------------+
+<virtualDevice>
+  <iosVersion>4.3</iosVersion> <!-- default to the iosVersion set for compiling -->
+  <family>ipad</family> <!-- default to the plateform, with universal being iphone -->
+</virtualDevice>
++-----------------------------------------------------------------------------+
+
+* Tests
+
+  Tests are based on Jasmine. The test phase is composed of 2 goals:
+
+  [javascript:prepare-titanium-jasmine-tests] Take the source and the tests scripts and
+  prepare them inside the <<<jasmineTargetDir>>> with a Titanium Appcelerator\u2122
+  jasmine test application.
+
+  [javascript:titanium-jasmine] Build the Titanium Appcelerator\u2122 test application
+  and install or run it on the specified platform.
+
+** Preparing tests
+
+  The directory containing the Titanium Appcelerator\u2122 JavaScript files may be
+  specified by setting the <<<sourceDirectory>>> property.
+
+  The Jasmine specs files are located under <<<jasmineTestSourceDirectory>>>. Just like
+  the compile phase, it's possible to have platform specific tests by putting them in
+  an appropriate platform folder.
+
+  By default <<<prepare-titanium-jasmine-tests>>> will extract it's own
+  Titanium Appcelerator\u2122 test application. However, you can specify your own
+  Titanium Appcelerator\u2122 test application by setting the
+  <<<jasmineTitaniumAppSourceDirectory>>> property.
+  You can explicitely exclude some specs files using the <<<specExcludes>>> parameter.
+
+
+--------------------------
+|- src
+  `- test
+    `- javascript
+      |- android
+      `- iphone
+--------------------------
+
+  Resulting structure:
+
+--------------------------
+|- target
+  `- titanium-jasmine
+    |- android
+    | `- Resources
+    `- iphone
+      `- Resources
+--------------------------
+
+** Running tests
+
+  As the phase package use the <<<executeMode>>> parameter to determine how the application
+  should be executed, the test phase use the <<<testExecuteMode>>> parameter.
+  If <<<testExecuteMode>>> is not specified, the value of <<<executeMode>>> will be used.
+
+  Note that if <<<testExecuteMode>>> is not specified and <<<executeMode>>> is 'None',
+  <<<testExecuteMode>>> will be 'None' and tests will be skipped.

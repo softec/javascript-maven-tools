@@ -1,0 +1,25 @@
+<!--
+  ~ Copyright 2011 SOFTEC sa. All rights reserved.
+  ~
+  ~ This source code is licensed under the Creative Commons
+  ~ Attribution-NonCommercial-NoDerivs 3.0 Luxembourg
+  ~ License.
+  ~
+  ~ To view a copy of this license, visit
+  ~ http://creativecommons.org/licenses/by-nc-nd/3.0/lu/
+  ~ or send a letter to Creative Commons, 171 Second Street,
+  ~ Suite 300, San Francisco, California, 94105, USA.
+  -->
+
+<assembler>
+    <scripts>
+        <script>
+            <fileName>app.js</fileName>
+            <includes>
+                <include>utils.js</include>
+                <include>main.js</include>
+                <include>merged.js</include>
+            </includes>
+        </script>
+    </scripts>
+</assembler>

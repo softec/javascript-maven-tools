@@ -1,0 +1,525 @@
+Developing a Titanium Appcelerator\u2122 application
+
+  A Titanium Appcelerator\u2122 application is made of several JavaScript files
+  and some images resources.
+
+  To manage the resources, you'll need to use the Maven Resources Plugin.
+  The Javascript Maven Plugin only deals with the JavaScript part and the execution of
+  the Titanium Appcelerator\u2122 application on a mobile device.
+
+  The first step to create a Titanium Appcelerator\u2122 application is to use the
+  <<<titanium>>> packaging:
+
++-----------------------------------------------------------------------------+
+<project>
+  <groupId>com.mycompany</groupId>
+  <artifactId>myartifact</artifactId>
+  <version>1.0</version>
+  <packaging>titanium</packaging>
+  <name>My Project name</name>
+  <description>My project description</description>
+</project>
++-----------------------------------------------------------------------------+
+* Project structure
+
+  You should arrange your project using the following structure:
+
++-----------------------------------------------------------------------------+
+ |- pom.xml
+ `- src
+  |- assembler
+  | `- myartifact.xml
+  |- main
+  | |- javascript
+  | | |- android
+  | | | `- Android specific .js files
+  | | |- iphone
+  | | | `- iOS specific .js files
+  | | `- Common .js files
+  | `- resources
+  |   |- Resources
+  |   | `- Titanium resources such as images, using a layout like a standard titanium project.
+  |   `- tiapp.xml
+  `- test
+    `- javascript
+      `- Jasmine .js spec files.
++-----------------------------------------------------------------------------+
+
+  The <<<src/assembler>>> folder will contain the assembler descriptor. By default, the
+  <<<titanium-compile>>> goal will search for an assembler descriptor whose name match
+  the one of the artifact id.
+
+  The <<<src/JavaScript>>> folder will contain the JavaScript files that will be processed
+  by the <<<titanium-compile>>> goal in order to produce the Titanium Appcelerator\u2122
+  project source files.
+
+  The <<<src/resources>>> folder should hold the <<<tiapp.xml>>> file and the Resources
+  folder needed by the Titanium Appcelerator\u2122 project without the JavaScript files.
+
+  The <<<src/test/javascript>>> folder will contain the Jasmine JavaScript specs files
+  that will be used to perform tests from a Titanium Appcelerator\u2122 test application.
+
+* Preparing the resources.
+
+  As previously written, this plugin doesn't manage the Titanium Appcelerator\u2122
+  resources by itself. So in order to be usable, you will need to configure the resource
+  plugin to copy the resources at the appropriate location.
+
+  Suppose you have the following output directories and are producing the android platform:
+
++-----------------------------------------------------------------------------+
+<project>
+  ...
+  <build>
+    <outputDirectory>target/titanium</outputDirectory>
+    <testOutputDirectory>target/titanium-jasmine</testOutputDirectory>
+    ...
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo.JavaScript</groupId>
+        <artifactId>JavaScript-maven-plugin</artifactId>
+        <version>1.1-softec</version>
+        <extensions>true</extensions>
+        <configuration>
+          <platform>android</platform>
+          ...
+        </configuration>
+      </plugin>
+      ...
+    </plugins>
+  </build>
+  ...
+</project>
++-----------------------------------------------------------------------------+
+
+  If you have followed the default structure, you'll need to copy the <<<tiapp.xml>>>
+  and the <<<Resources>>> folder into <<<outputDirectory>>>/<<<platform>>>.
+  You can perform this quite easily by using the Maven Resources Plugin:
+
++-----------------------------------------------------------------------------+
+<project>
+   ...
+   <build>
+     <plugins>
+        ...
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.5</version>
+          <configuration>
+            <outputDirectory>target/titanium/android</outputDirectory>
+          </configuration>
+        </plugin>
+     </plugins>
+   </build>
+   ...
+</project>
++-----------------------------------------------------------------------------+
+
+  You can also filter the <<<tiapp.xml>>> using:
+
++-----------------------------------------------------------------------------+
+<project>
+  ...
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/tiapp.xml</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/tiapp.xml</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    ...
+  </build>
+  ...
+</project>
++-----------------------------------------------------------------------------+
+
+* Compile
+
+  The first specific goal of the the <<<titanium>>> packaging is <<<titanium-compile>>>.
+
+  The <<<titanium-compile>>> goal assembles the JavaScript files so they can be later used
+  by the <<<titanium-prepare-package>>> goal to create the Titanium Appcelerator\u2122
+  application.
+
+  To be able to determine the platform for which the Titanium Appcelerator\u2122
+  application should be created, the <<<platform>>> property should be specified.
+  Currently accepted values are:
+
+   * android
+
+   * iphone
+
+   * ipad
+
+   * universal
+
+   []
+
+  As for any standard JavaScript packaging, the <<<titanium>>> one expects to find its
+  files under <<<src/main/JavaScript>>> by default. This location may be changed by
+  setting the <<<sourceDirectory>>> property.
+  When preparing the Titanium Appcelerator\u2122 project folder, the <<<platform>>> value
+  is used to select only the appropriate files. So if you have specified <iphone> or <ipad>
+  or <universal> as platform and have the following structure:
+
++-----------------------------------------------------------------------------+
+  src
+  `- main
+    `- JavaScript
+      |- custom.js
+      |- android
+      | `- custom.js
+      `- iphone
+        `- custom.js
++-----------------------------------------------------------------------------+
+
+  The content of the <<<custom.js>>> file under the <<<iphone>>> folder will be used
+  instead of the one inside of the <<<JavaScript>>> folder. The content of the
+  <<<android>>> folder will completely ignored.
+
+  The location of the assembled JavaScript files is determined by <<<outputDirectory>>>,
+  <<<platform>>> and <<<scriptDir>>>. By default <<<outputDirectory>>> is
+  <<<${project.build.outputDirectory}>>> and <<<scriptDir>>> is <<<<platform>-scripts>>>.
+  So if you specify an output directory of <<<target/titanium>>> and an <<<android>>>
+  platform, the compile goal will place the scripts in the
+  <<<target/titanium/android-scripts>>> folder.
+
+* Prepare package
+
+  This is the first goal of the <<<package>>> phase. It has 2 distincts behavior depending
+  of the value of <<<executeMode>>>.
+
+  If <<<executeMode>>> is <<<none>>>, <<<titanium-prepare-package>>> consider that we're
+  going to distribute the application and will compress and strip the sources resulting
+  of the <<<titanium-compile>>> goal.
+
+  Otherwise, <<<titanium-prepare-package>>> will use the value of <<<forceCompress>>> to
+  determine it's behavior. If <<<forceCompress>>> is true, the source compression and
+  stripping will occur. If false, it will only copy the sources to the destination.
+
+  This goals takes the sources from the value of <<<scriptsDirectory>>> which by default
+  is the value of <<<outputDirectory>>> and from the <<<scriptsDir>>> folder name.
+
+  The resulting files are stored inside <<<<compressedDirectory>/<platform>/Resources>>>.
+  By default the value of <<<compressedDirectory>>> is equal to <<<outputDirectory>>>.
+
+  When stripping the files, an intermediate location is created that will contain the stripped files
+  before they're compressed. This folder is built using <<<strippedDirectory>>>/<<<strippedDirName>>>.
+  By default <<<strippedDirectory>>> is <<<${project.build.directory}/stripped>>> and
+  <<<strippedDirName>>> is <<<<platform>-stripped>>>.
+
+  You specify the compressor and stripping setting as you would for the <<<compress>>> goal.
+
+* Package
+
+  This goal <<<package>>> a Titanium Appcelerator\u2122 application or
+  execute a Titanium Appcelerator\u2122 project on a device or emulator.
+
+  This goal expects to find the Titanium Appcelerator\u2122 project source files inside
+  the <<<outputDirectory>>>/<<<platform>>> folder which is where the
+  <<<titanium-prepare-package>>> goal will produce its files.
+
+  It then tries to retrieve the Titanium Appcelerator\u2122 builder script to call. To
+  retrieve the builder, it performs the following steps:
+
+  [[1]] If <<<androidBuilder>>> or <<<iosBuilder>>> properties are specified inside
+  <<<titaniumSettings>>>, the appropriate platform builder will be called,
+  regardless of the specified <<<titaniumVersion>>>.
+
+  [[2]] If <<<titaniumVersion>>> is specified and if the SDK was installed in
+  the default Titanium Appcelerator\u2122 installation folder, the appropriate builder
+  will be called.
+
+  [[3]] If <<<titaniumVersion>>> is specified but the builders are not found in the
+  appropriate location, an artifact having the <<<org.appcelerator.titanium>>> groupId,
+  the <<<titanium-mobile>>> artifactId for the specified Titanium Appcelerator\u2122
+  version will be retrieved.
+
+  Once the Titanium Appcelerator\u2122 project folder and builder are retrieved the
+  required parameters depends on the <<<platform>>> and <<<executeMode>>>.
+
+** Android platform
+
+  You indicate that you're building for the Android platform by specifying <<<android>>> as
+  the <<<platform>>> and an android API number.
+  You also need to specify the location of the android sdk home folder or have
+  the ANDROID_HOME environment variable or the androidSDK property sets properly.
+
++-----------------------------------------------------------------------------+
+  <platform>android</platform>
+  <androidAPI>11</androidAPI>
+  <titaniumSettings>
+    <androidSDK>$ANDROID_HOME</androidSDK>
+  </titaniumSettings>
++-----------------------------------------------------------------------------+
+
+*** Virtual device execution
+
+  You indicate a virtual device execution by specifying:
+
++-----------------------------------------------------------------------------+
+  <executeMode>virtual</executeMode> or -DexecuteMode=virtual on the command line
++-----------------------------------------------------------------------------+
+
+  In order to use the virtual device execution, you need to specify a <<<virtualDevice>>>
+  parameter which specifies the virtual device configuration.
+  In that virtual device block, you specify the Android api of the Android AVD;
+  the skin that the AVD will be using and the number of miliseconds to wait between
+  the launch of the emulator and the launch of the application deployment on the virtual
+  device.
+
++-----------------------------------------------------------------------------+
+  <virtualDevice>
+    <androidAPI>9</androidAPI>
+    <skin>HVGA</skin>
+    <wait>60000</wait>
+  </virtualDevice>
++-----------------------------------------------------------------------------+
+
+*** Physical device execution
+
+  You indicate a device execution by specifying:
+
++-----------------------------------------------------------------------------+
+  <executeMode>device</executeMode> or -DexecuteMode=device on the command line
++-----------------------------------------------------------------------------+
+
+  In this case, you don't need to specify a virtual device configuration.
+
+*** Distribution
+
+  You tell the package goal to use the distribution mode by specifying:
+
++-----------------------------------------------------------------------------+
+  <executeMode>none</executeMode>  or -DexecuteMode=none on the command line
++-----------------------------------------------------------------------------+
+
+  This indication is not enough as you'll also need to specify how the application should
+  be signed by adding keystore informations in <<<titaniumSettings>>>
+
++-----------------------------------------------------------------------------+
+  <titaniumSettings>
+     <keystore>keystore.file</keystore>
+     <keystorePassword>keystorepassword</keystorePassword>
+     <keystoreAlias>keystoreAlias</keystoreAlias>
+  </titaniumSettings>
++-----------------------------------------------------------------------------+
+
+** The iOS platform
+
+  You indicate that you're building for the iOS platform using one of the following
+  platform value:
+
+  * iphone
+
+  * ipad
+
+  * universal
+
+  []
+
+*** Virtual device execution
+
+  You specify that you want a virtual device execution by setting <<<executeMode>>> to
+  <<<virtual>>>.
+
+  In that case, you may want to specify a <<<virtualDevice>>> section.
+  This section will indicate on which device family the application will be executed.
+
++-----------------------------------------------------------------------------+
+  <virtualDevice>
+    <family>ipad</family>
+  </virtualDevice>
++-----------------------------------------------------------------------------+
+
+  Currently <<<family>>> only accept <<<ipad>>> or <<<iphone>>>. The family default to
+  the current <<<platform>>> with <<<universal>>> being <<<iphone>>>.
+
+*** Physical device execution for testing
+
+  If you want to execute the application on a real iOS device, you don't need to specify
+  the <<<virtualDevice>>> section, but you need to fill those properties in
+  <<<titaniumSettings>>>:
+
+  * iosDevelopmentProvisioningProfile
+
+  * iosDevelopmentCertificate
+
+*** Distribution
+
+  When <<<executeMode>>> is set to <<<none>>, the packaging is done for final distribution
+  and the certificate and provisioning profile is retreive from <<<titaniumSettings>>> in:
+
+  * iosDistributionProvisioningProfile
+
+  * iosDistributionCertificate
+
+  []
+
+* Prepare Titanium Jasmine tests
+
+  The <<<prepare-titanium-jasmine-tests>>> goal will prepare a Titanium Appcelerator\u2122
+  project structure for executing Jasmine specs. It will skip tests if <<<skipTests>>>
+  is true or if the <<<jasmineTestSourceDirectory>>> doesn't exist.
+
+  This goal expects to find the Jasmine specs files in the <<<jasmineTestSourceDirectory>>>.
+
+  It's also possible to exclude specific specs files by specifying <<<specExcludes>>>.
+
+  You can specify sources that should be loaded first in a specific order by using
+  <<<preloadSources>>>.
+
+* Titanium Jasmine tests
+
+  The <<<titanium-jasmine>>> goal is similar to <<<titanium-package>>> except that it will
+  proceed with the Titanium Appcelerator\u2122 test application. The <<<executeMode>>>
+  could be overwritten using <<<testExecuteMode>>>.
+
+Developing a standard Javascript library with a Titanium classified version
+
+  Under the Titanium Appcelerator\u2122 environment, some features of JavaScript such as
+  the DOM model are not available but some mobile specific interface components are
+  provided. This may lead to the development of a specific version of a JavaScript
+  library for Titanium.
+
+  Generally speaking, a Titanium JavaScript library is no different from a normal one, but
+  will require a Titanium Appcelerator\u2122 testing phase. The default Jasmine test
+  implementation use a browser, whereas the Titanium Appcelerator\u2122 tests launch
+  Jasmine under a virtual or physical device.
+
+  In all cases, the packaging of the library still remain <<<javascript>>>.
+  The main implication of the packaging is that the lifecycle will not be changed to use
+  the <<<titanium>>> packaging one.
+
+  Let's sum up those information inside a sample pom.xml:
+
++-----------------------------------------------------------------------------+
+<project>
+  <groupId>my.groupid</groupId>
+  <artifactId>sample</artifactId>
+  <version>1.0</version>
+  <packaging>javascript</packaging>
+
+  ...
+</project>
++-----------------------------------------------------------------------------+
+
+  Now that we have the project details setup, we will define the default build
+  configuration. This configuration will contain the common settings of the
+  JavaScript Maven Plugin.
+
++-----------------------------------------------------------------------------+
+<project>
+  ...
+  <build>
+    <outputDirectory>target/scripts</outputDirectory>
+    <testOutputDirectory>target/test-scripts</testOutputDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo.JavaScript</groupId>
+        <artifactId>JavaScript-maven-plugin</artifactId>
+        <version>1.1-softec</version>
+        <extensions>true</extensions>
+        <configuration>
+          ...
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
++-----------------------------------------------------------------------------+
+
+  Now that we have setup the common build settings, we will split the rest of the
+  POM into 2 profiles:
+
+  [release] which will be the default profile and which will contain the configuration
+  needed to create the default JavaScript library.
+
+  [titanium] which will be for the Titanium Appcelerator\u2122 classified version.
+
+  []
+
+  In this tutorial we will focus on the <<<titanium>>> profile, as the <<<release>>> profile
+  is no different from a normal JavaScript library.
+
+  Just like any JavaScript library, it's possible to perform jasmine tests on the library.
+  But the default Jasmine tests will be executed inside a browser, which may not be the
+  desired behaviour for the Titanium version of the library. To perform the tests on a
+  mobile device, we will need to customize the titanium profile's executions.
+
+  The first execution will prevent the default jasmine test phase to execute by overriding
+  the <<<default-jasmine>>> execution.
+
+  The second execution will configure the <<<prepare-titanium-jasmine-tests>>> goal and
+  the last one will do the same for the <<<titanium-jasmine>>> goal.
+  Notice that the <<<prepare-titanium-jasmine-tests>>> allows us to prevent some spec files
+  from executing using the <<<specExcludes>>> parameter.
+
++-----------------------------------------------------------------------------+
+<project>
+  ...
+  <profiles>
+    ...
+    <profile>
+        <id>titanium</id>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo.JavaScript</groupId>
+                    <artifactId>JavaScript-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-jasmine</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>prepare-jasmine-tests</goal>
+                            <goal>jasmine</goal>
+                            <configuration>
+                                <skipTests>true</skipTests>
+                            </configuration>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>titanium-test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>prepare-titanium-jasmine-tests</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/titanium-scripts</outputDirectory>
+                            <specExcludes>
+                                <specExclude>dom/*.js</specExclude>
+                            </specExcludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>titanium-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>titanium-jasmine</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/titanium-scripts</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+  </profiles>
+</project>
++-----------------------------------------------------------------------------+
+
+  By default a default tiapp.xml will be generated for the application if an existing
+  tiapp.xml file is not present in the <<<testOutputDirectory>>>.

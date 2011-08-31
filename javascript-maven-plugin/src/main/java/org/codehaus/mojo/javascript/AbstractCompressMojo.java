@@ -184,18 +184,7 @@ public abstract class AbstractCompressMojo
     public void execute()
         throws MojoExecutionException
     {
-        DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir( getSourceDirectory() );
-        if ( includes == null )
-        {
-            includes = DEFAULT_INCLUDES;
-        }
-        scanner.setIncludes( includes );
-        scanner.addDefaultExcludes();
-        if ( excludes != null )
-        {
-            scanner.setExcludes( excludes );
-        }
+        DirectoryScanner scanner = getDirectoryScanner();
         scanner.scan();
         String[] files = scanner.getIncludedFiles();
 
@@ -220,6 +209,22 @@ public abstract class AbstractCompressMojo
         }
         logStats( HR );
         logStats( "compression saved " + INTEGER.format( saved ) + " bytes" );
+    }
+
+    protected DirectoryScanner getDirectoryScanner() {
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setBasedir( getSourceDirectory() );
+        if ( includes == null )
+        {
+            includes = DEFAULT_INCLUDES;
+        }
+        scanner.setIncludes( includes );
+        scanner.addDefaultExcludes();
+        if ( excludes != null )
+        {
+            scanner.setExcludes( excludes );
+        }
+        return scanner;
     }
 
     private File stripDebugs( String name, File file )

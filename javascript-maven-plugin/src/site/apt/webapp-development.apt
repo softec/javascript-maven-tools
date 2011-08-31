@@ -1,23 +1,17 @@
- ------
- Guide to Developing Javascript in a web application
- ------
- Nicolas De Loof
- ------
-
-Guide to Developing Javascript in a web application using Maven 2
+Guide to Developing Javascript in a web application using Maven
 
 * Introduction
 
  This guide is intended to assist users to support Javascript development in a
- Maven 2 war projects.
+ Maven war projects.
 
-** Conventions
+** Folder Structure
 
- The maven javascript tool set use the following conventions for directory
+ The Maven JavaScript Plugin uses the following conventions for folder
  structure. This is only a standard layout, not a requirement, but will keep
  your POM files as simple as possible.
 
-+----+
++-----------------------------------------------------------------------------+
   <project-root>/
   |
   +- pom.xml
@@ -33,15 +27,15 @@ Guide to Developing Javascript in a web application using Maven 2
   |  |  +- javascript/ (source location for (jsunit) test sources)
   |  |
   ...
-+----+
++-----------------------------------------------------------------------------+
 
 ** Project Definition
 
- Your project must configure some extentions to the maven base to enable the
- javascript support. You must also setup the javascript plugin to run  during
+ Your project must configure some extentions to the Maven base to enable the
+ JavaScript support. You must also setup the Maven JavaScript Plugin to run during
  the standard WAR lifecycle :
 
-+----+
++-----------------------------------------------------------------------------+
 <project>
 
   <modelVersion>4.0.0</modelVersion>
@@ -74,19 +68,19 @@ Guide to Developing Javascript in a web application using Maven 2
     </plugins>
   </build>
 </project>
-+----+
++-----------------------------------------------------------------------------+
 
-  The javascript-maven-plugin handle javascript libraries as project
+  The Javascript Maven Plugin handle JavaScript libraries as project
   dependencies, when dependency type is set to <<<javascript>>>.
   Don't forget the <<<\<extensions\>true\</extensions\>>>> element
   to enable this feature.
 
-  Once you have your pom setup then you can build the webapp in the normal way
+  Once you have your POM setup then you can build the web application in the normal way
   via:
 
-----
++-----------------------------------------------------------------------------+
 mvn install
-----
++-----------------------------------------------------------------------------+
 
 ** Development version vs release
 
@@ -106,7 +100,7 @@ mvn install
   [[2]] Use the inplace Mojo with a lightweight servlet engine
 
   The Inplace Mojo can be used to prepare the (uncompressed) javascript
-  application in your webapplication source directory. This can be used to run
+  application in your web application source directory. This can be used to run
   the webapp with the
   {{{http://www.mortbay.org/maven-plugin/index.html}maven jetty plugin}}.
   In such a case, don't forget to exclude the src/main/webapp/sripts folder
