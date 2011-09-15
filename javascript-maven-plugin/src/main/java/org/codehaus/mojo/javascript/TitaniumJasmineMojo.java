@@ -132,7 +132,7 @@ public class TitaniumJasmineMojo extends AbstractTitaniumPackageMojo {
                         project.getName() + " Test",
                         getPlatformTestOutputDirectory().getAbsolutePath(),
                         getAppId(),
-                        getVirtualDevice().getAndroidAPI(),
+                        getAndroidAPI(),
                         getVirtualDevice().getSkin());
                 Process deviceProcess = pb.start();
                 getLog().info("Deploying on device ");

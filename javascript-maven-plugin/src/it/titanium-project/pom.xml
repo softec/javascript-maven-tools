@@ -80,7 +80,7 @@
                     <androidAPI>11</androidAPI>
                     <titaniumVersion>1.7.2</titaniumVersion>
                     <virtualDevice>
-                        <androidAPI>9</androidAPI>
+                        <androidAPI>10</androidAPI>
                         <skin>HVGA</skin>
                         <wait>60000</wait>
                     </virtualDevice>
@@ -137,7 +137,7 @@
                             <androidAPI>11</androidAPI>
                             <titaniumVersion>1.7.2</titaniumVersion>
                             <virtualDevice>
-                                <androidAPI>9</androidAPI>
+                                <androidAPI>10</androidAPI>
                                 <skin>HVGA</skin>
                                 <wait>120000</wait>
                             </virtualDevice>
@@ -165,7 +165,7 @@
                             <androidAPI>11</androidAPI>
                             <titaniumVersion>1.7.2</titaniumVersion>
                             <virtualDevice>
-                                <androidAPI>9</androidAPI>
+                                <androidAPI>10</androidAPI>
                                 <skin>HVGA</skin>
                                 <wait>60000</wait>
                             </virtualDevice>
