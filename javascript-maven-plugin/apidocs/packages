@@ -1,0 +1,11 @@
+org.codehaus.mojo.javascript
+org.codehaus.mojo.javascript.assembler
+org.codehaus.mojo.javascript.compress
+org.codehaus.mojo.javascript.titanium
+org.inconspicuous.jsmin
+searls.jasmine
+searls.jasmine.format
+searls.jasmine.io
+searls.jasmine.model
+searls.jasmine.runner
+org.codehaus.mojo.javascript.assembler.io.xpp3

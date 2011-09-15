@@ -1,0 +1,72 @@
+-classpath
+'/Users/DenisG/dev/javascript-maven-tools/javascript-compressor/yahooui-compressor/target/classes:/Users/DenisG/dev/javascript-maven-tools/javascript-compressor/yahooui-compressor/target/test-classes:/Users/DenisG/.m2/repository/org/apache/maven/maven-profile/2.2.1/maven-profile-2.2.1.jar:/Users/DenisG/.m2/repository/rhino/js/1.6R7/js-1.6R7.jar:/Users/DenisG/.m2/repository/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1/plexus-container-default-1.0-alpha-9-stable-1.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-repository-metadata/2.2.1/maven-repository-metadata-2.2.1.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-artifact-manager/2.2.1/maven-artifact-manager-2.2.1.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-plugin-registry/2.2.1/maven-plugin-registry-2.2.1.jar:/Users/DenisG/dev/javascript-maven-tools/javascript-compressor/javascript-compressor-api/target/javascript-compressor-api-1.1-softec.jar:/Users/DenisG/.m2/repository/org/codehaus/plexus/plexus-interpolation/1.11/plexus-interpolation-1.11.jar:/Users/DenisG/.m2/repository/com/yahoo/platform/yui/yuicompressor/2.4.2/yuicompressor-2.4.2.jar:/Users/DenisG/.m2/repository/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-project/2.2.1/maven-project-2.2.1.jar:/Users/DenisG/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-settings/2.2.1/maven-settings-2.2.1.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-artifact/2.2.1/maven-artifact-2.2.1.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-plugin-api/2.0/maven-plugin-api-2.0.jar:/Users/DenisG/.m2/repository/org/apache/maven/wagon/wagon-provider-api/1.0-beta-6/wagon-provider-api-1.0-beta-6.jar:/Users/DenisG/.m2/repository/classworlds/classworlds/1.1-alpha-2/classworlds-1.1-alpha-2.jar:/Users/DenisG/.m2/repository/org/codehaus/plexus/plexus-utils/1.5.9/plexus-utils-1.5.9.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-model/2.2.1/maven-model-2.2.1.jar'
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/Users/DenisG/dev/javascript-maven-tools/javascript-compressor/yahooui-compressor/src/test/java'
+-author
+-bottom
+'Copyright &#169; 2011 <a href="http://softec.lu/">SOFTEC sa</a>. All Rights Reserved.'
+-charset
+'UTF-8'
+-d
+'/Users/DenisG/dev/javascript-maven-tools/javascript-compressor/yahooui-compressor/target/site/testapidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'Yahoo UI compressor support 1.1-softec Test API'
+-link
+'../apidocs'
+-linkoffline
+'http://javascript-maven.softec.lu/javascript-compressor/javascript-compressor-api/apidocs' '/Users/DenisG/dev/javascript-maven-tools/javascript-compressor/javascript-compressor-api/target/site/testapidocs'
+-linkoffline
+'http://javascript-maven.softec.lu/javascript-compressor/shrinksafe-compressor/apidocs' '/Users/DenisG/dev/javascript-maven-tools/javascript-compressor/shrinksafe-compressor/target/site/testapidocs'
+-linkoffline
+'http://javascript-maven.softec.lu/javascript-maven-plugin/apidocs' '/Users/DenisG/dev/javascript-maven-tools/javascript-maven-plugin/target/site/testapidocs'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoAggregatorTypeTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoComponentFieldTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoConfiguratorTypeTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoExecuteTypeTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoExecutionStrategyTypeTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoGoalTypeTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoInheritByDefaultTypeTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoInstantiationStrategyTypeTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoParameterFieldTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoPhaseTypeTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoReadOnlyFieldTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoRequiredFieldTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoRequiresDependencyResolutionTypeTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoRequiresDirectInvocationTypeTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoRequiresOnLineTypeTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoRequiresProjectTypeTaglet'
+-taglet
+'org.apache.maven.tools.plugin.javadoc.MojoRequiresReportsTypeTaglet'
+-taglet
+'org.codehaus.plexus.javadoc.PlexusConfigurationTaglet'
+-taglet
+'org.codehaus.plexus.javadoc.PlexusRequirementTaglet'
+-taglet
+'org.codehaus.plexus.javadoc.PlexusComponentTaglet'
+-tagletpath
+'/Users/DenisG/.m2/repository/org/apache/maven/plugin-tools/maven-plugin-tools-javadoc/2.5/maven-plugin-tools-javadoc-2.5.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-profile/2.0/maven-profile-2.0.jar:/Users/DenisG/.m2/repository/jtidy/jtidy/4aug2000r7-dev/jtidy-4aug2000r7-dev.jar:/Users/DenisG/.m2/repository/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1/plexus-container-default-1.0-alpha-9-stable-1.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-repository-metadata/2.0/maven-repository-metadata-2.0.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-plugin-descriptor/2.0.6/maven-plugin-descriptor-2.0.6.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-artifact-manager/2.0/maven-artifact-manager-2.0.jar:/Users/DenisG/.m2/repository/jmock/jmock/1.0.0/jmock-1.0.0.jar:/Users/DenisG/.m2/repository/org/apache/maven/reporting/maven-reporting-api/2.0.6/maven-reporting-api-2.0.6.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-project/2.0/maven-project-2.0.jar:/Users/DenisG/.m2/repository/junit/junit/3.8.2/junit-3.8.2.jar:/Users/DenisG/.m2/repository/com/thoughtworks/qdox/qdox/1.6.3/qdox-1.6.3.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-plugin-api/2.0.6/maven-plugin-api-2.0.6.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-artifact/2.0/maven-artifact-2.0.jar:/Users/DenisG/.m2/repository/ant/ant/1.5.1/ant-1.5.1.jar:/Users/DenisG/.m2/repository/org/apache/maven/wagon/wagon-provider-api/1.0-alpha-5/wagon-provider-api-1.0-alpha-5.jar:/Users/DenisG/.m2/repository/classworlds/classworlds/1.1-alpha-2/classworlds-1.1-alpha-2.jar:/Users/DenisG/.m2/repository/org/apache/maven/plugin-tools/maven-plugin-tools-java/2.5/maven-plugin-tools-java-2.5.jar:/Users/DenisG/.m2/repository/org/apache/maven/plugin-tools/maven-plugin-tools-api/2.5/maven-plugin-tools-api-2.5.jar:/Users/DenisG/.m2/repository/org/codehaus/plexus/plexus-utils/1.5.6/plexus-utils-1.5.6.jar:/Users/DenisG/.m2/repository/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-7/doxia-sink-api-1.0-alpha-7.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-model/2.0/maven-model-2.0.jar:/Users/DenisG/.m2/repository/org/codehaus/plexus/plexus-javadoc/1.0/plexus-javadoc-1.0.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-core/2.0/maven-core-2.0.jar:/Users/DenisG/.m2/repository/org/apache/maven/doxia/doxia-decoration-model/1.0-alpha-7/doxia-decoration-model-1.0-alpha-7.jar:/Users/DenisG/.m2/repository/commons-lang/commons-lang/2.1/commons-lang-2.1.jar:/Users/DenisG/.m2/repository/org/codehaus/plexus/plexus-velocity/1.1.2/plexus-velocity-1.1.2.jar:/Users/DenisG/.m2/repository/org/codehaus/plexus/plexus-container-default/1.0-alpha-9/plexus-container-default-1.0-alpha-9.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-plugin-descriptor/2.0/maven-plugin-descriptor-2.0.jar:/Users/DenisG/.m2/repository/org/codehaus/plexus/plexus-interactivity-api/1.0-alpha-4/plexus-interactivity-api-1.0-alpha-4.jar:/Users/DenisG/.m2/repository/commons-collections/commons-collections/2.0/commons-collections-2.0.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-error-diagnostics/2.0/maven-error-diagnostics-2.0.jar:/Users/DenisG/.m2/repository/org/apache/maven/shared/maven-plugin-testing-harness/1.1/maven-plugin-testing-harness-1.1.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-project/2.0.8/maven-project-2.0.8.jar:/Users/DenisG/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-settings/2.0.8/maven-settings-2.0.8.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-artifact/2.0.8/maven-artifact-2.0.8.jar:/Users/DenisG/.m2/repository/org/apache/maven/wagon/wagon-provider-api/1.0-beta-2/wagon-provider-api-1.0-beta-2.jar:/Users/DenisG/.m2/repository/classworlds/classworlds/1.1-alpha-2/classworlds-1.1-alpha-2.jar:/Users/DenisG/.m2/repository/commons-logging/commons-logging-api/1.0.4/commons-logging-api-1.0.4.jar:/Users/DenisG/.m2/repository/org/codehaus/plexus/plexus-utils/1.4.6/plexus-utils-1.4.6.jar:/Users/DenisG/.m2/repository/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-7/doxia-sink-api-1.0-alpha-7.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-model/2.0.8/maven-model-2.0.8.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-monitor/2.0/maven-monitor-2.0.jar:/Users/DenisG/.m2/repository/org/apache/maven/doxia/doxia-site-renderer/1.0-alpha-7/doxia-site-renderer-1.0-alpha-7.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-profile/2.0.8/maven-profile-2.0.8.jar:/Users/DenisG/.m2/repository/commons-cli/commons-cli/1.0/commons-cli-1.0.jar:/Users/DenisG/.m2/repository/org/apache/maven/wagon/wagon-http-lightweight/1.0-alpha-5/wagon-http-lightweight-1.0-alpha-5.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-repository-metadata/2.0.9/maven-repository-metadata-2.0.9.jar:/Users/DenisG/.m2/repository/org/apache/maven/doxia/doxia-core/1.0-alpha-7/doxia-core-1.0-alpha-7.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-artifact-manager/2.0.9/maven-artifact-manager-2.0.9.jar:/Users/DenisG/.m2/repository/org/codehaus/plexus/plexus-i18n/1.0-beta-6/plexus-i18n-1.0-beta-6.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-plugin-registry/2.0.8/maven-plugin-registry-2.0.8.jar:/Users/DenisG/.m2/repository/org/apache/maven/plugins/maven-javadoc-plugin/2.4/maven-javadoc-plugin-2.4.jar:/Users/DenisG/.m2/repository/velocity/velocity/1.4/velocity-1.4.jar:/Users/DenisG/.m2/repository/org/apache/maven/reporting/maven-reporting-api/2.0.8/maven-reporting-api-2.0.8.jar:/Users/DenisG/.m2/repository/org/apache/maven/wagon/wagon-file/1.0-alpha-5/wagon-file-1.0-alpha-5.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-plugin-api/2.0.8/maven-plugin-api-2.0.8.jar:/Users/DenisG/.m2/repository/org/codehaus/plexus/plexus-archiver/1.0-alpha-7/plexus-archiver-1.0-alpha-7.jar:/Users/DenisG/.m2/repository/velocity/velocity-dep/1.4/velocity-dep-1.4.jar:/Users/DenisG/.m2/repository/org/apache/maven/wagon/wagon-ssh/1.0-alpha-5/wagon-ssh-1.0-alpha-5.jar:/Users/DenisG/.m2/repository/oro/oro/2.0.7/oro-2.0.7.jar:/Users/DenisG/.m2/repository/org/apache/maven/maven-plugin-parameter-documenter/2.0/maven-plugin-parameter-documenter-2.0.jar:/Users/DenisG/.m2/repository/com/jcraft/jsch/0.1.23/jsch-0.1.23.jar'
+-use
+-version
+-windowtitle
+'Yahoo UI compressor support 1.1-softec Test API'
