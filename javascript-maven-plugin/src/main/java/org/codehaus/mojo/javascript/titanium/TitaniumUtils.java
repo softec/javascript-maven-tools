@@ -21,6 +21,7 @@ import org.codehaus.mojo.javascript.VirtualDevice;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -273,6 +274,74 @@ public class TitaniumUtils {
             }
         } else if (isUnix()) {
             sdkPath = homeFolder + "/.titanium/mobilesdk/linux/" + version + "/";
+            sdkFile = new File(sdkPath);
+            if (!sdkFile.exists()) {
+                sdkPath = null;
+            }
+        }
+
+        return sdkPath;
+    }
+
+    public static List<String> getAvailableTitaniumSdkVersions() {
+        String basePath = getTitaniumBaseSdkPath();
+        if (basePath == null) {
+            return null;
+        }
+
+        File baseFolder = new File(basePath);
+        File[] files = baseFolder.listFiles();
+        if (files != null && files.length > 0) {
+            List<String> versions = new ArrayList<String>();
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    versions.add(f.getName());
+                }
+            }
+            if (!versions.isEmpty()) {
+                return versions;
+            }
+        }
+        return null;
+    }
+
+    public static String getLatestAvailableTitaniumSdkVersion() {
+        List<String> versions = getAvailableTitaniumSdkVersions();
+        if (versions != null) {
+            Collections.sort(versions);
+            return versions.get(versions.size() -1);
+        }
+        return null;
+    }
+
+    public static String getTitaniumBaseSdkPath() {
+        final String homeFolder = System.getProperty("user.home");
+        String sdkPath = null;
+        File sdkFile = null;
+
+        if (isMac()) {
+            sdkPath = homeFolder + "/Library/Application Support/Titanium/mobilesdk/osx/";
+            sdkFile = new File(sdkPath);
+            if (!sdkFile.exists()) {
+                sdkPath = "/Library/Application Support/Titanium/mobilesdk/osx/";
+                sdkFile = new File(sdkPath);
+                if (!sdkFile.exists()) {
+                    sdkPath = null;
+                }
+            }
+        } else if (isWindows()) {
+            final String userProfileFolder = System.getenv("ALLUSERSPROFILE");
+            sdkPath = userProfileFolder + "\\Titanium\\mobilesdk\\win32\\";
+            sdkFile = new File(sdkPath);
+            if (!sdkFile.exists()) {
+                sdkPath = "C:\\Documents and Settings\\All Users\\Application Data\\Titanium\\mobilesdk\\win32\\";
+                sdkFile = new File(sdkPath);
+                if (!sdkFile.exists()) {
+                    sdkPath = null;
+                }
+            }
+        } else if (isUnix()) {
+            sdkPath = homeFolder + "/.titanium/mobilesdk/linux/";
             sdkFile = new File(sdkPath);
             if (!sdkFile.exists()) {
                 sdkPath = null;

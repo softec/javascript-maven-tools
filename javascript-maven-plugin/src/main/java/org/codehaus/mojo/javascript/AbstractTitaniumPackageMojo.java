@@ -625,7 +625,8 @@ public abstract class AbstractTitaniumPackageMojo extends AbstractMojo {
 
                 newFile.setReadable(true);
                 newFile.setWritable(true);
-                if (getFileExtension(newFile).equals("py")) {
+                if (getFileExtension(newFile).equals("py")
+                        || newFile.getName().compareToIgnoreCase("iphonesim") == 0) {
                     newFile.setExecutable(true);
                 }
             }

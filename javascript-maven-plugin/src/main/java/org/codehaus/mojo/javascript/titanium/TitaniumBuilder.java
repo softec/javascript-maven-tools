@@ -383,7 +383,7 @@ public class TitaniumBuilder {
                 appuuid,
                 distName,
                 targetDir.getAbsolutePath(),
-                family);
+                family).redirectErrorStream(true);
 
         log.info("ProcessBuilder: " + getProcessBuilderString(pb));
         boolean relaunch = false;
@@ -392,7 +392,7 @@ public class TitaniumBuilder {
             StringBuilder logContent = new StringBuilder();
 
             Process p = pb.start();
-            TitaniumBuilder.logProcess(p, log, logContent, false);
+            TitaniumBuilder.logProcess(p, log, logContent, true);
             p.waitFor();
             result = p.exitValue();
             if (failOnTiapp(tiProjectDirectory.getAbsolutePath(), logContent.toString())) {
@@ -406,7 +406,7 @@ public class TitaniumBuilder {
             log.warn("Relaunching builder as it failed on missing tiapp.xml");
             try {
                 Process p = pb.start();
-                TitaniumBuilder.logProcess(p, log);
+                TitaniumBuilder.logProcess(p, log, null, true);
                 p.waitFor();
                 result = p.exitValue();
             } catch (Throwable t) {
@@ -425,13 +425,17 @@ public class TitaniumBuilder {
      * If no data is present when the method is called, nothing is outputed to the log</p>
      * @param log The logger to use to log the message.
      * @param reader The reader from which a line should be read.
+     * @param defaultLogLevel The default log level to use to log message when the
+     * log level is not present in the parsed line.
+     * @return the log level used to log the line.
      */
-    public static void logProcessLine(Log log, BufferedReader reader) {
+    public static String logProcessLine(Log log, BufferedReader reader, String defaultLogLevel) {
         try {
-            readAndAppendLine(reader, log, null);
+            defaultLogLevel = readAndAppendLine(reader, log, null, defaultLogLevel);
         } catch (IOException ioe) {
             log.error("Error while processing input", ioe);
         }
+        return defaultLogLevel;
     }
 
     /**
@@ -457,16 +461,18 @@ public class TitaniumBuilder {
         BufferedReader inReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         BufferedReader errReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
+        String defaultInLevel = null;
+        String defaultErrLevel = null;
         try {
             while(isProcessRunning(p)) {
-                readAndAppendLine(inReader, log, builder);
+                defaultInLevel = readAndAppendLine(inReader, log, builder, defaultInLevel);
                 if (!skipErrStream) {
-                    readAndAppendLine(errReader, log, builder);
+                    defaultErrLevel = readAndAppendLine(errReader, log, builder, defaultErrLevel);
                 }
             }
-            readAndAppendLine(inReader, log, builder);
+            readAndAppendLine(inReader, log, builder, defaultInLevel);
             if (!skipErrStream) {
-                readAndAppendLine(errReader, log, builder);
+                readAndAppendLine(errReader, log, builder, defaultErrLevel);
             }
         } catch (IOException ioe) {
             log.error("Error while processing builder input", ioe);
@@ -478,15 +484,18 @@ public class TitaniumBuilder {
      * @param reader The reader from which the line should be read.
      * @param log The logger where the line should be appended. May be null.
      * @param builder The builder where the line should be appended. May be null.
+     * @param defaultLogLevel The default log level to use to log message when
+     * the log level is not present on the line.
      * @throws IOException If an I/O exception occurs.
+     * @return The log level used to log the message or the defaultLogLevel if no log specified
      */
-    private static void readAndAppendLine(BufferedReader reader, Log log, StringBuilder builder)
+    private static String readAndAppendLine(BufferedReader reader, Log log, StringBuilder builder, String defaultLogLevel)
     throws IOException {
         if (reader.ready()) {
             String line = reader.readLine();
             if (line != null) {
                 if (log != null) {
-                    parseTitaniumBuilderLine(line, log);
+                    defaultLogLevel = parseTitaniumBuilderLine(line, log, defaultLogLevel);
                 }
                 if (builder != null) {
                     builder.append(line);
@@ -494,6 +503,7 @@ public class TitaniumBuilder {
                 }
             }
         }
+        return defaultLogLevel;
     }
 
 
@@ -515,22 +525,52 @@ public class TitaniumBuilder {
      * Parse a line and output to the specified logger using the appropriate level.
      * @param line The line to parse.
      * @param log The logger.
+     * @param defaultLogLevel The log level to use if the parsed line doesn't contain
+     * the log level info.
+     * @return the log level used to log the line.
      */
-    private static void parseTitaniumBuilderLine(String line, Log log) {
-        final Pattern pattern = Pattern.compile("\\[(TRACE|INFO|DEBUG|ERROR)\\] (.+)");
+    private static String parseTitaniumBuilderLine(String line, Log log, String defaultLogLevel) {
+        final Pattern pattern = Pattern.compile("\\[(TRACE|INFO|DEBUG|WARN|ERROR)\\] (.+)");
         final Matcher matcher = pattern.matcher(line);
         if (matcher.find()) {
             String type = matcher.group(1);
             String msg = matcher.group(2);
             if (type.equals("TRACE") || type.equals("DEBUG")) {
                 log.debug(msg);
+                return "DEBUG";
             } else if (type.equals("INFO")) {
                 log.info(msg);
+                return "INFO";
             } else if (type.equals("ERROR")) {
                 log.error(msg);
+                return "ERROR";
+            } else if (type.equals("WARN")){
+                log.warn(msg);
+                return "WARN";
+            } else {
+                log.debug(msg);
+                return "DEBUG";
             }
         } else {
-            log.debug(line);
+            if (defaultLogLevel != null) {
+                defaultLogLevel = defaultLogLevel.toUpperCase();
+                if (defaultLogLevel.equals("DEBUG") || defaultLogLevel.equals("TRACE")) {
+                    log.debug(line);
+                } else if (defaultLogLevel.equals("INFO")) {
+                    log.info(line);
+                } else if (defaultLogLevel.equals("ERROR")) {
+                    log.error(line);
+                } else if (defaultLogLevel.equals("WARN")) {
+                    log.warn(line);
+                } else {
+                    log.debug(line);
+                    defaultLogLevel = "DEBUG";
+                }
+                return defaultLogLevel;
+            } else {
+                log.debug(line);
+                return "DEBUG";
+            }
         }
     }
 

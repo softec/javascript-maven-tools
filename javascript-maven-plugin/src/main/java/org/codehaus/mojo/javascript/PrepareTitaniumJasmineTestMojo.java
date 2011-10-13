@@ -21,6 +21,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.surefire.shade.org.codehaus.plexus.util.FileUtils;
 import org.codehaus.mojo.javascript.archive.JavascriptArtifactManager;
+import org.codehaus.mojo.javascript.titanium.TitaniumUtils;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.IOUtil;
@@ -95,7 +96,6 @@ public class PrepareTitaniumJasmineTestMojo extends AbstractMojo {
      * </dl>
      *
      * @parameter expression="${platform}"
-     * @required
      */
     protected String platform;
 
@@ -183,6 +183,14 @@ public class PrepareTitaniumJasmineTestMojo extends AbstractMojo {
             return;
         }
 
+        if (platform == null) {
+            if (TitaniumUtils.getOsClassifier().equals("osx")) {
+                platform = "iphone";
+            } else {
+                platform = "android";
+            }
+        }
+
         getLog().info("Processing source folder: " + outputDirectory.getAbsolutePath());
         getPlatformTestOutputDirectory().mkdirs();
         File depsDirectory = new File(getPlatformTestOutputDirectory(), "Resources" + File.separator + libsDirectory);
@@ -267,7 +275,13 @@ public class PrepareTitaniumJasmineTestMojo extends AbstractMojo {
         // 3. generate app.js file
         createTestAppJs(sourceFiles);
 
-        // 4. Ensure tiapp.xml presence
+        // 4. Ensure platform specific folder existence (for version 1.8)
+        File resourceFld = new File(getPlatformTestOutputDirectory(), "Resources");
+        resourceFld.mkdirs();
+        new File(resourceFld, "iphone").mkdir();
+        new File(resourceFld, "android").mkdir();
+
+        // 5. Ensure tiapp.xml presence
         try {
             ensureTiApp();
         } catch (Throwable t) {

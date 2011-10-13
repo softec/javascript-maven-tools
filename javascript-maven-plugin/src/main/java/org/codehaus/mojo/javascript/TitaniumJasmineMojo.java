@@ -70,6 +70,31 @@ public class TitaniumJasmineMojo extends AbstractTitaniumPackageMojo {
      */
     protected boolean skipTests;
 
+    /**
+     * <p>The platform for which the code should be packaged.</p>
+     * <p>Supported platforms are:</p>
+     * <dl>
+     *     <dt>android</dt>
+     *     <dd>Package for the android platform.</dd>
+     *     <dt>iphone</dt>
+     *     <dd>Package for the iPhone platform.</dd>
+     *     <dt>ipad</dt>
+     *     <dd>Package for the iPad platform.</dd>
+     *     <dt>universal</dt>
+     *     <dd>Package for iPhone and iPad.</dd>
+     * </dl>
+     *
+     * @parameter expression="${platform}"
+     */
+    protected String platform;
+
+    /**
+     * The titanium SDK version to use.
+     *
+     * @parameter expression="${titaniumVersion}"
+     */
+    protected String titaniumVersion;
+
     protected String getAppId() {
         return project.getGroupId() + "." + project.getArtifactId() + ".test";
     }
@@ -80,6 +105,23 @@ public class TitaniumJasmineMojo extends AbstractTitaniumPackageMojo {
             return;
         }
 
+        if (platform == null) {
+            if (TitaniumUtils.getOsClassifier().equals("osx")) {
+                platform = "iphone";
+            } else {
+                platform = "android";
+            }
+        }
+        super.platform = platform;
+        if (titaniumVersion == null) {
+            try {
+                titaniumVersion = TitaniumUtils.getLatestAvailableTitaniumSdkVersion();
+            } catch (Throwable t) {
+                getLog().error("Unable to find a Titanium mobile SDK on the computer", t);
+                return;
+            }
+        }
+        super.titaniumVersion = titaniumVersion;
         TitaniumUtils.checkVirtualDevice(platform, getTitaniumSettings(), getVirtualDevice());
 
         if (!checkPomSettings()) {
