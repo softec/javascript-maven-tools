@@ -104,6 +104,16 @@ public class TitaniumPreparePackage extends AbstractCompressMojo {
      */
     private String strippedDirName;
 
+    /**
+     * The compressor to used. Either "shrinksafe", "yahooui" or "jsmin" for default compressor,
+	 * or a custom one provided as an artifact in repo org.codehaus.mojo.javascript:[xxx]-compressor.
+     * <p>Use "none" to avoid compression.</p>
+     *
+     * @parameter default-value="none"
+     */
+    private String compressor;
+
+
     protected String getScriptsDir() {
         if (scriptsDir == null) {
             scriptsDir = platform + "-scripts";
@@ -155,6 +165,16 @@ public class TitaniumPreparePackage extends AbstractCompressMojo {
     protected File getSourceDirectory()
     {
         return new File(scriptsDirectory, getScriptsDir());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.codehaus.mojo.javascript.AbstractCompressMojo#getCompressorName()
+     */
+    @Override
+    protected String getCompressorName() {
+        return compressor;
     }
 
     @Override

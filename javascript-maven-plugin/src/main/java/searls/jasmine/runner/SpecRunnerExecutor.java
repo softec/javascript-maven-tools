@@ -32,6 +32,7 @@ import com.gargoylesoftware.htmlunit.IncorrectnessListener;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.ScriptResult;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HTMLParserListener;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import searls.jasmine.io.IOUtilsWrapper;
@@ -64,9 +65,9 @@ public class SpecRunnerExecutor {
 		WebClient webClient = new WebClient((BrowserVersion) Browsers.get(browser));
 		webClient.setJavaScriptEnabled(true);
 		webClient.setAjaxController(new NicelyResynchronizingAjaxController());
-		
+
 		quietIncorrectnessListener(webClient);
-		
+
 	    HtmlPage page = webClient.getPage(runnerUrl);
 	    waitForRunnerToFinish(page);
 	    

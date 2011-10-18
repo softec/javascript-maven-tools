@@ -71,7 +71,8 @@
                 <version>1.1-softec</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <compressor>yahooUI</compressor>
+                    <compressor>none</compressor>
+                    <!--<compressor>yahooUI</compressor>-->
                     <optimizationLevel>5</optimizationLevel>
                     <strip>;;;</strip>
 

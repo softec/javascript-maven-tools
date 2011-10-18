@@ -130,14 +130,6 @@ public abstract class AbstractCompressMojo
     private int languageVersion;
 
     /**
-     * The compressor to used. Either "shrinksafe", "yahooui" or "jsmin" for default compressor, 
-	 * or a custom one provided as an artifact in repo org.codehaus.mojo.javascript:[xxx]-compressor.
-     * 
-     * @parameter default-value="jsmin"
-     */
-    private String compressor;
-
-    /**
      * Don't display compression stats
      * 
      * @parameter
@@ -290,9 +282,21 @@ public abstract class AbstractCompressMojo
         }
     }
 
+    /**
+     * Retrieve the name of the compressor to use to compress the files.
+     * @return The name opf the compressor, or null/"none" to skip compression.
+     */
+    protected abstract String getCompressorName();
+
     private JSCompressor getCompressor()
         throws MojoExecutionException
     {
+        String compressor = getCompressorName();
+
+        if (compressor == null || compressor.toLowerCase().equals("none")) {
+            return null;
+        }
+
         if ( compressors.containsKey( compressor ) )
         {
             return (JSCompressor) compressors.get( compressor );
@@ -405,7 +409,15 @@ public abstract class AbstractCompressMojo
             File stripped = stripDebugs( name, in );
             try
             {
-                jscompressor.compress( stripped, compressed, optimizationLevel, languageVersion );
+                if (jscompressor == null) {
+                    try {
+                        FileUtils.copyFile(stripped, compressed);
+                    } catch (IOException e) {
+                        throw new MojoExecutionException( "Error creating temp file for stripped version", e );
+                    }
+                } else {
+                    jscompressor.compress( stripped, compressed, optimizationLevel, languageVersion );
+                }
             }
             catch ( CompressionException e )
             {

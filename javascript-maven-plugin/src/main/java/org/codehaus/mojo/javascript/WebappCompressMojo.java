@@ -57,6 +57,15 @@ public class WebappCompressMojo
     private String classifier;
 
     /**
+     * The compressor to used. Either "shrinksafe", "yahooui" or "jsmin" for default compressor,
+	 * or a custom one provided as an artifact in repo org.codehaus.mojo.javascript:[xxx]-compressor.
+     * <p>Use "none" to avoid compression.</p>
+     *
+     * @parameter default-value="jsmin"
+     */
+    private String compressor;
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.codehaus.mojo.javascript.AbstractCompressMojo#getExtension()
@@ -96,4 +105,13 @@ public class WebappCompressMojo
         return new File( webappDirectory, scripts );
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.codehaus.mojo.javascript.AbstractCompressMojo#getCompressorName()
+     */
+    @Override
+    protected String getCompressorName() {
+        return compressor;
+    }
 }
